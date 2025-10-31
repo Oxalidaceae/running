@@ -2,14 +2,15 @@
   "name": "@running/backend",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "dev": "echo 'Backend dev server - configure as needed'",
-    "build": "echo 'Backend build - configure as needed'"
+    "dev": "npx ts-node --project tsconfig.node.json src/geo.ts",
+    "build": "tsc --project tsconfig.node.json"
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^24.6.0",
-    "typescript": "~5.9.3"
+    "@types/node": "^20.11.19",
+    "typescript": "~5.9.3",
+    "ts-node": "^10.9.2"
   }
 }
