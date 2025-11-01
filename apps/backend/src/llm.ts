@@ -2,7 +2,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFile } from "fs/promises";
 
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+// 환경 변수 확인 및 로깅
+const apiKey = process.env.GOOGLE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.error('❌ Gemini API 키가 설정되지 않았습니다!');
+  console.log('사용 가능한 환경 변수:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
+}
+
+const gemini = new GoogleGenerativeAI(apiKey!);
 
 export async function recommendCourse(courses: any[], outputPath?: string) {
   // v1 API로 호출하도록 강제 설정 (기본값 v1beta로 인한 404 방지)

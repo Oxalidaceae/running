@@ -52,6 +52,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// 환경 변수 디버깅 엔드포인트 (프로덕션에서는 제거 권장)
+app.get('/api/debug/env', (req, res) => {
+  const envVars = {
+    NODE_ENV: process.env.NODE_ENV,
+    KAKAO_REST_API_KEY: process.env.KAKAO_REST_API_KEY ? `${process.env.KAKAO_REST_API_KEY.substring(0, 8)}...` : 'undefined',
+    GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY ? `${process.env.GOOGLE_GEMINI_API_KEY.substring(0, 8)}...` : 'undefined',
+    GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY ? `${process.env.GOOGLE_MAPS_API_KEY.substring(0, 8)}...` : 'undefined',
+    availableKeys: Object.keys(process.env).filter(k => k.includes('KAKAO') || k.includes('GOOGLE') || k.includes('GEMINI'))
+  };
+  res.json(envVars);
+});
+
 export default (req: VercelRequest, res: VercelResponse) => {
   return app(req, res);
 };
