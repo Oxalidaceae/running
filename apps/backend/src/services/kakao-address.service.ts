@@ -1,8 +1,10 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
-// 백엔드 루트의 .env.local 파일 로드
-config({ path: resolve(process.cwd(), '.env.local') });
+// 로컬 개발 환경에서만 .env.local 파일 로드 (Vercel에서는 환경변수 자동 제공)
+if (process.env.NODE_ENV !== 'production') {
+  config({ path: resolve(process.cwd(), '.env.local') });
+}
 
 export interface AddressInfo {
   address_name: string;
