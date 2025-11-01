@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { getAddressFromCoordinate } from '../src/services/kakao-address.service';
 
 const router = express.Router();
 
@@ -83,6 +84,61 @@ router.post('/geolocation', async (req: Request<{}, {}, GeolocationRequestBody>,
     console.error('Geolocation API 오류:', error);
     res.status(500).json({
       error: '위치 정보를 가져올 수 없습니다.',
+    });
+  }
+});
+
+/**
+ * GET /api/reverse-geocode
+ * 카카오맵 API를 사용하여 좌표를 주소로 변환
+ */
+router.get('/reverse-geocode', async (req: Request, res: Response) => {
+  try {
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        error: '위도(lat)와 경도(lng) 파라미터가 필요합니다.',
+      });
+    }
+
+    const latitude = parseFloat(lat as string);
+    const longitude = parseFloat(lng as string);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({
+        success: false,
+        error: '유효한 위도와 경도 값을 입력해주세요.',
+      });
+    }
+
+    const address = await getAddressFromCoordinate(latitude, longitude);
+
+    if (address) {
+      res.json({
+        success: true,
+        address: address,
+        coordinates: {
+          latitude,
+          longitude,
+        },
+      });
+    } else {
+      res.json({
+        success: false,
+        error: '주소를 찾을 수 없습니다.',
+        coordinates: {
+          latitude,
+          longitude,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Reverse geocoding 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : '주소 변환 중 오류가 발생했습니다.',
     });
   }
 });

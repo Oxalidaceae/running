@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
-
-interface Position {
-  latitude: number;
-  longitude: number;
-  accuracy?: number;
-}
-
-interface UseGeolocationReturn {
-  position: Position | null;
-  error: string | null;
-  loading: boolean;
-  method: 'gps' | 'google-api' | null;
-}
+import type { Position, GeolocationResult } from '../types/index';
+import { API_BASE_URL, GEOLOCATION_OPTIONS } from '../constants/index';
 
 /**
  * 기기의 GPS를 우선 사용하고, 실패하면 백엔드 API(Google Geolocation)를 사용하는 커스텀 훅
@@ -21,7 +10,7 @@ interface UseGeolocationReturn {
  * 1순위: 네이티브 GPS (높은 정확도)
  * 2순위: 백엔드 Google Geolocation API (IP 기반, 낮은 정확도)
  */
-export const useGeolocation = (): UseGeolocationReturn => {
+export const useGeolocation = (): GeolocationResult => {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,11 +23,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
         try {
           const gpsPosition = await new Promise<GeolocationPosition>(
             (resolve, reject) => {
-              navigator.geolocation.getCurrentPosition(resolve, reject, {
-                enableHighAccuracy: true, // GPS 사용
-                timeout: 10000, // 10초 타임아웃
-                maximumAge: 0, // 캐시 사용 안 함
-              });
+              navigator.geolocation.getCurrentPosition(resolve, reject, GEOLOCATION_OPTIONS);
             }
           );
 
@@ -57,7 +42,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
 
       // 2순위: 백엔드 Google Geolocation API 폴백
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const apiUrl = API_BASE_URL;
 
         const response = await fetch(`${apiUrl}/api/geolocation`, {
           method: 'POST',

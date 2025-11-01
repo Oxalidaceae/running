@@ -10,4 +10,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    port: 5175,
+    strictPort: true,
+    cors: {
+      origin: true,
+      credentials: true,
+    },
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    },
+  },
+  define: {
+    global: 'globalThis',
+  },
 })
