@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getAddressFromCoordinate } from '../src/services/kakao-address.service';
+import { getAddressFromCoordinate } from '../src/services/kakao-address.service.js';
 
 const router = express.Router();
 

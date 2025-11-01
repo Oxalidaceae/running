@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getElevations } from '../src/services/elevation.service';
+import { getElevations } from '../src/services/elevation.service.js';
 
 const router = express.Router();
 

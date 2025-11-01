@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import { getCurrentLocation } from '../src/services/geolocation.service';
-import { circle12Points, divideLinePoints, type LatLon } from '../src/geo';
-import { getElevations } from '../src/services/elevation.service';
-import { getAddressesFromCoordinates } from '../src/services/kakao-address.service';
-import { recommendCourse } from '../src/llm';
+import { getCurrentLocation } from '../src/services/geolocation.service.js';
+import { circle12Points, divideLinePoints, type LatLon } from '../src/geo.js';
+import { getElevations } from '../src/services/elevation.service.js';
+import { getAddressesFromCoordinates } from '../src/services/kakao-address.service.js';
+import { recommendCourse } from '../src/llm.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
