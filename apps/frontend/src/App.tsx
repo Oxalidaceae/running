@@ -52,7 +52,7 @@ export default function App() {
     try {
       setIsLoadingAddress(true);
       const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${lat}&lng=${lng}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.address) {
@@ -84,12 +84,12 @@ export default function App() {
 
   const handleCourseGeneration = async () => {
     if (!position || !distance) return
-    
+
     setIsGeneratingCourse(true)
-    
+
     try {
       console.log('🏃 코스 생성 요청 중...');
-      
+
       const response = await fetch('http://localhost:3000/api/courses/generate', {
         method: 'POST',
         headers: {
@@ -101,7 +101,7 @@ export default function App() {
           distance: parseFloat(distance),
         }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -159,7 +159,7 @@ export default function App() {
       estimatedTime: savedCourse.estimatedTime,
       waypoints: savedCourse.waypoints
     };
-    
+
     setSelectedCourse(course);
     setSelectedCourseUserPosition(savedCourse.userPosition); // 저장된 사용자 위치 사용
     setIsFromSavedCourse(true); // 저장된 코스에서 온 것임을 표시
@@ -214,13 +214,13 @@ export default function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          
+
           {/* 앱 제목 */}
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-semibold text-gray-800">오어달</h1>
             <span className="text-2xl">🏃‍♂️</span>
           </div>
-          
+
           {/* 빈 공간 (레이아웃 균형용) */}
           <div className="w-10"></div>
         </div>
@@ -329,8 +329,8 @@ export default function App() {
         >
           {isGeneratingCourse ? (
             <div className="flex items-center justify-center space-x-2">
+              <span>코스 생성 중</span>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              <span>코스 생성 중...</span>
             </div>
           ) : (
             '코스 추천'

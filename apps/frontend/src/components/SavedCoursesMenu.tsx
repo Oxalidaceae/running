@@ -1,5 +1,5 @@
 import React from 'react';
-import { getSavedCourses, removeSavedCourse, type SavedCourse } from '../utils/courseStorage';
+import { getSavedCourses, removeSavedCourse, removeSavedCourseByHash, type SavedCourse } from '../utils/courseStorage';
 
 interface SavedCoursesMenuProps {
   isOpen: boolean;
@@ -21,14 +21,20 @@ const SavedCoursesMenu: React.FC<SavedCoursesMenuProps> = ({
     }
   }, [isOpen]);
 
-  const handleDeleteCourse = (courseId: number, event: React.MouseEvent) => {
+  const handleDeleteCourse = (course: SavedCourse, event: React.MouseEvent) => {
     event.stopPropagation(); // 코스 선택 이벤트 방지
     
-    if (confirm('이 코스를 삭제하시겠습니까?')) {
+    if (confirm(`"${course.name}" 코스를 삭제하시겠습니까?`)) {
       try {
-        removeSavedCourse(courseId);
+        // courseHash가 있으면 해시로 삭제, 없으면 courseId로 삭제 (호환성)
+        if (course.courseHash) {
+          removeSavedCourseByHash(course.courseHash);
+        } else {
+          removeSavedCourse(course.courseId);
+        }
         setSavedCourses(getSavedCourses()); // 목록 새로고침
       } catch (error) {
+        console.error('코스 삭제 오류:', error);
         alert('코스 삭제에 실패했습니다.');
       }
     }
@@ -52,13 +58,21 @@ const SavedCoursesMenu: React.FC<SavedCoursesMenuProps> = ({
         <div 
           className="fixed inset-0 z-40"
           onClick={onClose}
+          style={{ pointerEvents: 'auto', backgroundColor: 'transparent' }}
         />
       )}
       
       {/* Sidebar */}
-      <div className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out border-r border-gray-200 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div 
+        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out border-r border-gray-200 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ 
+          pointerEvents: 'auto',
+          touchAction: 'pan-y'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b">
           <h2 className="text-lg font-semibold text-gray-800">저장된 코스</h2>
@@ -73,7 +87,13 @@ const SavedCoursesMenu: React.FC<SavedCoursesMenuProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div 
+          className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" 
+          style={{ 
+            maxHeight: 'calc(100vh - 80px)',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
           {savedCourses.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-500">
               <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,28 +106,32 @@ const SavedCoursesMenu: React.FC<SavedCoursesMenuProps> = ({
             <div className="p-4 space-y-3">
               {savedCourses.map((course) => (
                 <div
-                  key={course.courseId}
-                  className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200"
+                  key={course.courseHash || `course-${course.courseId}`}
+                  className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200 select-none"
                   onClick={() => {
                     onCourseSelect(course);
                     onClose();
+                  }}
+                  style={{ 
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    touchAction: 'manipulation'
                   }}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
                         <h3 className="font-semibold text-gray-800">{course.name}</h3>
-                        <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                          코스 {course.rank}
-                        </span>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2 mb-2 text-sm">
-                        <div className="flex justify-between">
+                        <div className="flex items-center space-x-1">
                           <span className="text-gray-600">거리:</span>
                           <span className="font-medium text-blue-600">{course.distance}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex items-center space-x-1">
                           <span className="text-gray-600">평점:</span>
                           <span className="font-medium text-blue-600">{course.scores.overall}/10</span>
                         </div>
@@ -123,7 +147,7 @@ const SavedCoursesMenu: React.FC<SavedCoursesMenuProps> = ({
                     </div>
                     
                     <button
-                      onClick={(e) => handleDeleteCourse(course.courseId, e)}
+                      onClick={(e) => handleDeleteCourse(course, e)}
                       className="ml-2 p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
                       title="코스 삭제"
                     >
