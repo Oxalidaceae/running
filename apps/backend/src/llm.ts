@@ -6,7 +6,8 @@ const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 export async function recommendCourse(courses: any[], outputPath?: string) {
   // v1 API로 호출하도록 강제 설정 (기본값 v1beta로 인한 404 방지)
   const model = gemini.getGenerativeModel(
-    { model: "gemini-2.5-flash" },
+    { model: "gemini-2.0-flash" },
+    { apiVersion: "v1" }
   );
 
   // 모델 응답에서 첫 번째 JSON 오브젝트만 안전하게 추출하는 유틸
@@ -73,7 +74,7 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
       "courseId": 1,
       "rank": 1,
       "summary": "코스 한 줄 요약",
-      "reason": "추천 이유 (midpoints 고도 변화 패턴 구체적으로)",
+      "reason": "추천 이유 (이 코스는 [midpoints 고도 변화 패턴 구체적으로])",
       "elevationAnalysis": {
         "averageChange": 5.0,
         "totalAscent": 50.0,
