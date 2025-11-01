@@ -1,0 +1,52 @@
+{
+  "recommendations": [
+    {
+      "courseId": 3,
+      "rank": 1,
+      "summary": "고도 변화가 거의 없는 매우 완만한 평지형 코스",
+      "reason": "midpoints 간 고도 변화가 평균 0.74m로 매우 낮으며, 총 상승량 1.33m, 총 하강량 0.15m에 불과하여 초보자도 쉽게 완주할 수 있는 이상적인 코스입니다. 짧은 오르막 후 아주 미세한 내리막 전환이 한 번 있으나, 전체적으로 거의 평지에 가깝고 고도 변화가 안정적입니다.",
+      "elevationAnalysis": {
+        "averageChange": 0.74,
+        "totalAscent": 1.33,
+        "totalDescent": 0.15,
+        "changeFrequency": "짧은 오르막 후 미세한 내리막 전환 1회"
+      },
+      "scores": {
+        "elevation": 10,
+        "overall": 10
+      }
+    },
+    {
+      "courseId": 4,
+      "rank": 2,
+      "summary": "꾸준히 완만하게 이어지는 내리막 경사의 편안한 코스",
+      "reason": "midpoints 간 평균 고도 변화량이 1.72m로 매우 낮으며, 총 하강량 3.44m로 완만한 내리막 경사가 일관되게 이어져 러닝하기에 매우 적합합니다. 고도 변화의 전환 없이 안정적인 하강 경사를 유지하여 초보자도 편안하게 완주할 수 있습니다.",
+      "elevationAnalysis": {
+        "averageChange": 1.72,
+        "totalAscent": 0,
+        "totalDescent": 3.44,
+        "changeFrequency": "일관된 내리막으로 고도 변화 전환 없음"
+      },
+      "scores": {
+        "elevation": 9,
+        "overall": 9
+      }
+    },
+    {
+      "courseId": 5,
+      "rank": 3,
+      "summary": "완만하게 상승하는 경사가 일관된 안정적인 코스",
+      "reason": "midpoints 간 평균 고도 변화량이 4.61m로 낮고, 총 상승량 9.21m로 꾸준히 오르막이 이어지지만 경사도가 완만하여 초보 러너도 큰 부담 없이 완주할 수 있습니다. 고도 변화의 전환이 없어 경로가 일관적이며, 안정적인 오르막 훈련에 적합합니다.",
+      "elevationAnalysis": {
+        "averageChange": 4.61,
+        "totalAscent": 9.21,
+        "totalDescent": 0,
+        "changeFrequency": "일관된 오르막으로 고도 변화 전환 없음"
+      },
+      "scores": {
+        "elevation": 8,
+        "overall": 8
+      }
+    }
+  ]
+}

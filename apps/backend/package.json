@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "generate-courses": "tsx src/generate.ts",
-    "add-elevation": "tsx src/add-elevation.ts"
+    "add-elevation": "tsx src/add-elevation.ts",
+    "recommend": "tsx src/recommend.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

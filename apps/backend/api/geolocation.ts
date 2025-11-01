@@ -29,11 +29,11 @@ interface GeolocationRequestBody {
  */
 router.post('/geolocation', async (req: Request<{}, {}, GeolocationRequestBody>, res: Response) => {
   try {
-    const apiKey = process.env.GOOGLE_GEOLOCATION_API_KEY;
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: 'Google Geolocation API 키가 설정되지 않았습니다.',
+        error: 'Google Maps API 키가 설정되지 않았습니다.',
       });
     }
 
