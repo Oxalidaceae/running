@@ -48,18 +48,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// 라우트 - Vercel에서 /api/* 요청이 들어오므로 경로 설정
-app.use('/', geolocationRouter);     // /api/geolocation, /api/reverse-geocode
-app.use('/', elevationRouter);       // /api/elevation
-app.use('/courses', coursesRouter);  // /api/courses/generate
+// 라우트 - Vercel routes가 /api/* 전체 경로를 전달하므로 /api 접두사로 마운트
+app.use('/api', geolocationRouter);     // /api/geolocation, /api/reverse-geocode
+app.use('/api', elevationRouter);       // /api/elevation
+app.use('/api/courses', coursesRouter);  // /api/courses/generate
 
 // 헬스 체크
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // 환경 변수 디버깅 엔드포인트 (프로덕션에서는 제거 권장)
-app.get('/debug/env', (req, res) => {
+app.get('/api/debug/env', (req, res) => {
   const envVars = {
     NODE_ENV: process.env.NODE_ENV,
     KAKAO_REST_API_KEY: process.env.KAKAO_REST_API_KEY ? `${process.env.KAKAO_REST_API_KEY.substring(0, 8)}...` : 'undefined',
@@ -78,13 +78,13 @@ app.use((req, res) => {
     path: req.url,
     method: req.method,
     registeredRoutes: [
-      'GET /health',
-      'GET /debug/env',
-      'POST /geolocation',
-      'GET /reverse-geocode',
-      'POST /elevation',
-      'GET /elevation/single',
-      'POST /courses/generate'
+      'GET /api/health',
+      'GET /api/debug/env',
+      'POST /api/geolocation',
+      'GET /api/reverse-geocode',
+      'POST /api/elevation',
+      'GET /api/elevation/single',
+      'POST /api/courses/generate'
     ]
   });
 });
