@@ -7,6 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import geolocationRouter from './api/geolocation';
 import elevationRouter from './api/elevation';
+import coursesRouter from './api/courses';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ console.log('MAPS API KEY:', process.env.GOOGLE_MAPS_API_KEY);
 // 라우트
 app.use('/api', geolocationRouter);
 app.use('/api', elevationRouter);
+app.use('/api/courses', coursesRouter);
 
 // 헬스 체크
 app.get('/health', (req, res) => {

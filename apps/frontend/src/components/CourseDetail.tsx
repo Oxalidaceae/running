@@ -44,16 +44,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     // 출발점 (현재 위치)
     const start = `출발점,${userPosition.latitude},${userPosition.longitude}`;
     
-    // 중간 waypoints
-    const waypoints = course.waypoints.map((point, index) => 
-      `경유지${index + 1},${point.latitude},${point.longitude}`
-    ).join('/');
+    // 경유지 (1개 - end 지점)
+    const waypoint = course.waypoints.length > 0 
+      ? `경유지,${course.waypoints[0].latitude},${course.waypoints[0].longitude}`
+      : '';
     
-    // 도착점 (다시 현재 위치로)
+    // 도착점 (출발점으로 복귀 - 원형 코스)
     const end = `도착점,${userPosition.latitude},${userPosition.longitude}`;
     
     // 전체 경로 조합
-    const fullPath = waypoints ? `${start}/${waypoints}/${end}` : `${start}/${end}`;
+    const fullPath = waypoint ? `${start}/${waypoint}/${end}` : `${start}/${end}`;
     
     return `https://map.kakao.com/link/by/walk/${fullPath}`;
   };
@@ -178,28 +178,28 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               </div>
             </div>
             
-            {/* 경유지들 */}
-            {course.waypoints.map((waypoint, index) => (
-              <div key={index} className="flex items-center space-x-3">
+            {/* 경유지 (1개) */}
+            {course.waypoints.length > 0 && (
+              <div className="flex items-center space-x-3">
                 <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">{index + 1}</span>
+                  <span className="text-white text-xs font-bold">1</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800">경유지 {index + 1}</p>
+                  <p className="text-sm font-medium text-gray-800">경유지</p>
                   <p className="text-xs text-gray-500">
-                    {waypoint.latitude.toFixed(4)}, {waypoint.longitude.toFixed(4)}
+                    {course.waypoints[0].latitude.toFixed(4)}, {course.waypoints[0].longitude.toFixed(4)}
                   </p>
                 </div>
               </div>
-            ))}
+            )}
             
-            {/* 도착점 */}
+            {/* 도착점 (출발점 복귀) */}
             <div className="flex items-center space-x-3">
               <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">E</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">도착점</p>
+                <p className="text-sm font-medium text-gray-800">도착점 (출발점 복귀)</p>
                 <p className="text-xs text-gray-500">
                   {userPosition.latitude.toFixed(4)}, {userPosition.longitude.toFixed(4)}
                 </p>

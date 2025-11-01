@@ -38,6 +38,7 @@ export default function App() {
   const [isGeneratingCourse, setIsGeneratingCourse] = useState(false)
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('main')
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [courses, setCourses] = useState<Course[]>([]) // 코스 데이터를 App에서 관리
   const [address, setAddress] = useState<string>('')
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
 
@@ -81,15 +82,44 @@ export default function App() {
     
     setIsGeneratingCourse(true)
     
-    // 코스 생성 화면으로 전환
-    setTimeout(() => {
-      setIsGeneratingCourse(false)
-      setCurrentScreen('course-recommendation')
-    }, 2000)
+    try {
+      console.log('🏃 코스 생성 요청 중...');
+      
+      const response = await fetch('http://localhost:3000/api/courses/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          latitude: position.latitude,
+          longitude: position.longitude,
+          distance: parseFloat(distance),
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCourses(data.courses);
+          console.log('✅ 코스 생성 완료:', data.courses.length + '개');
+          setCurrentScreen('course-recommendation');
+        } else {
+          alert(data.message || '코스 데이터를 가져올 수 없습니다.');
+        }
+      } else {
+        alert('서버에서 코스 데이터를 가져오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('코스 데이터 로딩 오류:', error);
+      alert('네트워크 오류가 발생했습니다.');
+    } finally {
+      setIsGeneratingCourse(false);
+    }
   }
 
   const handleBackToMain = () => {
     setCurrentScreen('main')
+    setCourses([]) // 메인으로 돌아갈 때 코스 데이터 초기화
   }
 
   const handleCourseSelect = (course: Course) => {
@@ -124,6 +154,7 @@ export default function App() {
       <CourseRecommendation
         distance={distance}
         position={position}
+        courses={courses} // 미리 가져온 코스 데이터 전달
         onBack={handleBackToMain}
         onCourseSelect={handleCourseSelect}
       />

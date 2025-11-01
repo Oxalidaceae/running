@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import type { Position } from '../types';
 
 interface ElevationAnalysis {
@@ -29,6 +29,7 @@ interface Course {
 interface CourseRecommendationProps {
   distance: string;
   position: Position;
+  courses: Course[]; // 미리 가져온 코스 데이터
   onBack: () => void;
   onCourseSelect: (course: Course) => void;
 }
@@ -36,14 +37,15 @@ interface CourseRecommendationProps {
 const CourseRecommendation: React.FC<CourseRecommendationProps> = ({ 
   distance, 
   position, 
+  courses, // props로 받은 코스 데이터 사용
   onBack,
   onCourseSelect 
 }) => {
   const [address, setAddress] = useState<string>('');
   const [isLoadingAddress, setIsLoadingAddress] = useState(true);
 
-  // 위치를 주소로 변환하는 함수
-  const fetchAddress = async () => {
+    // 위치를 주소로 변환하는 함수
+  const fetchAddress = useCallback(async () => {
     try {
       setIsLoadingAddress(true);
       const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
@@ -68,83 +70,12 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
     } finally {
       setIsLoadingAddress(false);
     }
-  };
+  }, [position.latitude, position.longitude]);
 
   useEffect(() => {
     fetchAddress();
-  }, [position.latitude, position.longitude]);
-  // 백엔드 추천 데이터 기반 코스 데이터
-  const courses: Course[] = [
-    {
-      courseId: 12,
-      rank: 1,
-      name: '코스1',
-      distance: `${distance} km`,
-      estimatedTime: `${Math.round(parseFloat(distance) * 5)}분`,
-      summary: "가장 완만하고 안정적인 상승 구간으로 이루어진 초보자에게 최적화된 코스입니다.",
-      reason: "midpoints 간 평균 고도 변화량이 1.21로 12개 코스 중 가장 낮으며, 총 누적 상승고도도 2.41로 매우 적습니다. 고도 변화의 방향 전환 없이 꾸준히 완만하게 상승하는 패턴을 보여 초보자가 편안하게 완주할 수 있는 가장 안정적인 코스입니다.",
-      elevationAnalysis: {
-        averageChange: 1.21,
-        totalAscent: 2.41,
-        totalDescent: 0
-      },
-      scores: {
-        elevation: 10,
-        overall: 9.8
-      },
-      waypoints: [
-        { latitude: position.latitude + 0.002, longitude: position.longitude + 0.003 },
-        { latitude: position.latitude + 0.004, longitude: position.longitude + 0.001 },
-        { latitude: position.latitude + 0.003, longitude: position.longitude - 0.002 }
-      ]
-    },
-    {
-      courseId: 7,
-      rank: 2,
-      name: '코스2',
-      distance: `${distance} km`,
-      estimatedTime: `${Math.round(parseFloat(distance) * 5.5)}분`,
-      summary: "고도 변화량은 매우 낮지만, 완만한 내리막과 오르막이 반복되는 평이한 코스입니다.",
-      reason: "midpoints 간 평균 고도 변화량이 3.21로 두 번째로 낮으며, 총 누적 상승/하강 고도 또한 3.21로 매우 적습니다. 고도 변화의 방향이 한번 전환(하강 후 상승)되지만, 각각 3.21m의 미미한 변화여서 급격한 경사 없이 완만한 러닝이 가능합니다.",
-      elevationAnalysis: {
-        averageChange: 3.21,
-        totalAscent: 3.21,
-        totalDescent: 3.21
-      },
-      scores: {
-        elevation: 9.5,
-        overall: 9.3
-      },
-      waypoints: [
-        { latitude: position.latitude - 0.001, longitude: position.longitude + 0.004 },
-        { latitude: position.latitude + 0.003, longitude: position.longitude + 0.002 },
-        { latitude: position.latitude + 0.002, longitude: position.longitude - 0.003 }
-      ]
-    },
-    {
-      courseId: 1,
-      rank: 3,
-      name: '코스3',
-      distance: `${distance} km`,
-      estimatedTime: `${Math.round(parseFloat(distance) * 6)}분`,
-      summary: "꾸준히 완만하게 상승하는 패턴을 가진 초보자에게 적합한 코스입니다.",
-      reason: "midpoints 간 평균 고도 변화량이 4.03으로 낮고, 총 누적 상승고도도 8.05로 적은 편입니다. 고도 변화의 방향 전환 없이 꾸준히 완만하게 상승하는 패턴을 보여주며, midpoints의 고도 변화가 안정적이어서 초보자가 안정적으로 달릴 수 있는 좋은 코스입니다.",
-      elevationAnalysis: {
-        averageChange: 4.03,
-        totalAscent: 8.05,
-        totalDescent: 0
-      },
-      scores: {
-        elevation: 9,
-        overall: 9
-      },
-      waypoints: [
-        { latitude: position.latitude + 0.001, longitude: position.longitude - 0.004 },
-        { latitude: position.latitude - 0.002, longitude: position.longitude - 0.002 },
-        { latitude: position.latitude - 0.003, longitude: position.longitude + 0.001 }
-      ]
-    }
-  ];
+  }, [fetchAddress]);
+  
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -187,41 +118,48 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
         {/* Course List */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">추천 코스</h3>
-          <div className="space-y-3">
-            {courses.map((course) => (
-              <button
-                key={course.courseId}
-                onClick={() => onCourseSelect(course)}
-                className="w-full border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">#{course.rank}</span>
-                    <span className="font-medium text-gray-700">{course.name}</span>
+          
+          {courses.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              추천할 수 있는 코스가 없습니다.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {courses.map((course) => (
+                <button
+                  key={course.courseId}
+                  onClick={() => onCourseSelect(course)}
+                  className="w-full border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">#{course.rank}</span>
+                      <span className="font-medium text-gray-700">{course.name}</span>
+                    </div>
+                    <span className="text-sm text-blue-600">{course.distance}</span>
                   </div>
-                  <span className="text-sm text-blue-600">{course.distance}</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}</p>
-                <p className="text-xs text-gray-500 mb-2">{course.summary}</p>
-                
-                {/* 고도 분석 정보 */}
-                <div className="flex space-x-4 text-xs text-gray-500 mb-2">
-                  <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
-                  <span>상승: {course.elevationAnalysis.totalAscent}m</span>
-                  {course.elevationAnalysis.totalDescent > 0 && (
-                    <span>하강: {course.elevationAnalysis.totalDescent}m</span>
-                  )}
-                </div>
-                
-                <div className="flex items-center justify-end mt-2">
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">평점</div>
-                    <div className="text-sm font-semibold text-blue-600">{course.scores.overall}/10</div>
+                  <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}</p>
+                  <p className="text-xs text-gray-500 mb-2">{course.summary}</p>
+                  
+                  {/* 고도 분석 정보 */}
+                  <div className="flex space-x-4 text-xs text-gray-500 mb-2">
+                    <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
+                    <span>상승: {course.elevationAnalysis.totalAscent}m</span>
+                    {course.elevationAnalysis.totalDescent > 0 && (
+                      <span>하강: {course.elevationAnalysis.totalDescent}m</span>
+                    )}
                   </div>
-                </div>
-              </button>
-            ))}
-          </div>
+                  
+                  <div className="flex items-center justify-end mt-2">
+                    <div className="text-right">
+                      <div className="text-xs text-gray-500">평점</div>
+                      <div className="text-sm font-semibold text-blue-600">{course.scores.overall}/10</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
