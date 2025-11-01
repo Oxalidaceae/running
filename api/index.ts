@@ -2,10 +2,10 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
 import cors from 'cors';
 
-// 백엔드 API 라우터들을 import
-import geolocationRouter from '../apps/backend/api/geolocation';
-import elevationRouter from '../apps/backend/api/elevation';
-import coursesRouter from '../apps/backend/api/courses';
+// 백엔드 API 라우터들을 import (ES module에서는 .js 확장자 필수)
+import geolocationRouter from '../apps/backend/api/geolocation.js';
+import elevationRouter from '../apps/backend/api/elevation.js';
+import coursesRouter from '../apps/backend/api/courses.js';
 
 const app = express();
 
