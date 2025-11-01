@@ -101,8 +101,8 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
               <span className="font-semibold text-blue-600">{distance} km</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">출발 위치:</span>
-              <span className="text-sm text-gray-800 max-w-48 text-right">
+              <span className="text-gray-600 flex-shrink-0">출발 위치:</span>
+              <span className="text-sm text-gray-800 text-right ml-2 flex-1">
                 {isLoadingAddress ? (
                   <span className="text-gray-500">주소 조회 중...</span>
                 ) : (
