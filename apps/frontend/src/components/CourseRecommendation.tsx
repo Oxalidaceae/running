@@ -137,14 +137,14 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
                     </div>
                     <span className="text-sm text-blue-600">{course.distance}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}</p>
+                  <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}  </p>
                   <p className="text-xs text-gray-500 mb-2">{course.summary}</p>
 
                   {/* 고도 분석 정보 */}
                   <div className="flex space-x-4 text-xs text-gray-500 mb-2">
-                    <span>상승: {course.elevationAnalysis.totalAscent}m</span>
-                    <span>하강: {course.elevationAnalysis.totalDescent}m</span>
-                    <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
+                    <span>총 상승: {course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
+                    <span>총 하강: {course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
+                    <span>평균 고도 변화: {course.elevationAnalysis.averageChange.toFixed(2)}m</span>
 
                   </div>
 
@@ -158,10 +158,10 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
               ))}
             </div>
           )}
-          
+
           {/* Back to Main Button */}
           <div className="mt-6">
-            <button 
+            <button
               onClick={onBack}
               className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
             >

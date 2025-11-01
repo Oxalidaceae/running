@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Position } from '../types';
+import { saveCourse, isCourseAlreadySaved, removeSavedCourse, removeSavedCourseByHash, getSavedCourses } from '../utils/courseStorage';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -30,12 +31,14 @@ interface CourseDetailProps {
   course: Course;
   userPosition: Position;
   onBack: () => void;
+  isFromSavedCourse?: boolean; // 저장된 코스에서 온 것인지 구분
 }
 
 const CourseDetail: React.FC<CourseDetailProps> = ({
   course,
   userPosition,
-  onBack
+  onBack,
+  isFromSavedCourse = false
 }) => {
   // Tmap HTML URL 생성
   const generateTmapUrl = () => {
@@ -48,6 +51,69 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     
     return `/src/components/tmap.html?${params.toString()}`;
   };
+
+  // 저장 모달 열기
+  const handleSaveCourse = async () => {
+    if (isSaved || isSaving) return;
+    
+    // 기본 이름을 현재 코스 이름 + 날짜로 설정
+    const defaultName = `${course.name} (${new Date().toLocaleDateString()})`;
+    setCustomCourseName(defaultName);
+    setShowSaveModal(true);
+  };
+
+  // 실제 코스 저장 함수
+  const handleConfirmSave = async () => {
+    const finalName = customCourseName.trim() || course.name;
+    
+    setIsSaving(true);
+    setShowSaveModal(false);
+    
+    try {
+      const courseToSave = {
+        ...course,
+        userPosition
+      };
+      await saveCourse(courseToSave, userPosition, finalName);
+      setIsSaved(true);
+      alert('코스가 저장되었습니다!');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '코스 저장에 실패했습니다.';
+      alert(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 저장된 코스 삭제 함수
+  const handleDeleteSavedCourse = async () => {
+    if (confirm(`"${course.name}" 코스를 삭제하시겠습니까?`)) {
+      try {
+        // 저장된 코스들 중에서 현재 코스와 일치하는 것을 찾아 해시로 삭제
+        const savedCourses = getSavedCourses();
+        const savedCourse = savedCourses.find(saved => 
+          saved.courseId === course.courseId && 
+          saved.userPosition.latitude === userPosition.latitude &&
+          saved.userPosition.longitude === userPosition.longitude
+        );
+        
+        if (savedCourse && savedCourse.courseHash) {
+          removeSavedCourseByHash(savedCourse.courseHash);
+        } else {
+          // fallback으로 courseId 사용
+          removeSavedCourse(course.courseId);
+        }
+        
+        setIsSaved(false);
+        alert('코스가 삭제되었습니다.');
+        onBack(); // 메인으로 돌아가기
+      } catch (error) {
+        console.error('코스 삭제 오류:', error);
+        alert('코스 삭제에 실패했습니다.');
+      }
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -58,7 +124,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-semibold text-gray-800">{course.name}</h1>
+          <h1 className="text-xl font-semibold text-gray-800">코스 상세</h1>
           <div className="w-10"></div>
         </div>
       </header>
@@ -84,47 +150,45 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         {/* Course Info */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-gray-800">코스 정보</h3>
-            <span className="bg-blue-500 text-white text-sm font-bold px-3 py-1 rounded-full">코스 {course.rank}</span>
+            <h4 className="font-medium text-gray-700 mb-2">🚩 코스 정보</h4>
+            <span className="bg-blue-500 text-white text-sm font-bold px-3 py-1 rounded-full">{course.name}</span>
           </div>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">거리:</span>
-                <span className="font-semibold text-blue-600">{course.distance}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">예상 시간:</span>
-                <span className="font-medium text-gray-800">{course.estimatedTime}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">평점:</span>
-                <span className="font-semibold text-blue-600">{course.scores.overall}/10</span>
-              </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">거리:</span>
+              <span className="font-semibold text-blue-600">{course.distance}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">예상 시간:</span>
+              <span className="font-semibold text-gray-800">{course.estimatedTime}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">평점:</span>
+              <span className="font-semibold text-blue-600">{course.scores.overall}/10</span>
+            </div>
+          </div>
 
-            {/* 고도 분석 정보 */}
-            <div className="border-t pt-3">
-              <h4 className="font-medium text-gray-700 mb-2">🏔️ 고도 분석</h4>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">총 상승:</span>
-                  <span className="font-medium text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">총 하강:</span>
-                  <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">평균 고도 변화:</span>
-                  <span className="font-medium">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
-                </div>
+          {/* 고도 분석 정보 */}
+          <div className="border-t pt-3 mt-3">
+            <h4 className="font-medium text-gray-700 mb-2">🏔️ 고도 분석</h4>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">총 상승:</span>
+                <span className="font-semibold text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">총 하강:</span>
+                <span className="font-semibold text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">평균 고도 변화:</span>
+                <span className="font-semibold text-gray-800">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
               </div>
             </div>
+          </div>
 
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-700">{course.summary}</p>
-            </div>
+          <div className="bg-gray-50 p-3 rounded-lg mt-3">
+            <p className="text-sm text-gray-700">{course.summary}</p>
           </div>
         </div>
 
@@ -154,24 +218,32 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">S</span>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">출발점</p>
                 <p className="text-xs text-gray-500">
-                  {userPosition.latitude.toFixed(4)}, {userPosition.longitude.toFixed(4)}
+                  {isLoadingAddresses ? (
+                    <span className="text-gray-400">주소 조회 중...</span>
+                  ) : (
+                    addresses.start
+                  )}
                 </p>
               </div>
             </div>
 
-            {/* 경유지 (1개) */}
+            {/* 반환점 */}
             {course.waypoints.length > 0 && (
               <div className="flex items-center space-x-3">
                 <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">M</span>
+                  <span className="text-white text-xs font-bold">T</span>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-800">경유지</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">반환점</p>
                   <p className="text-xs text-gray-500">
-                    {course.waypoints[0].latitude.toFixed(4)}, {course.waypoints[0].longitude.toFixed(4)}
+                    {isLoadingAddresses ? (
+                      <span className="text-gray-400">주소 조회 중...</span>
+                    ) : (
+                      addresses.waypoint
+                    )}
                   </p>
                 </div>
               </div>
@@ -182,10 +254,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">E</span>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">도착점 (출발점 복귀)</p>
                 <p className="text-xs text-gray-500">
-                  {userPosition.latitude.toFixed(4)}, {userPosition.longitude.toFixed(4)}
+                  {isLoadingAddresses ? (
+                    <span className="text-gray-400">주소 조회 중...</span>
+                  ) : (
+                    addresses.end
+                  )}
                 </p>
               </div>
             </div>
@@ -195,13 +271,137 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         {/* Action Buttons */}
         <div className="space-y-3">
           <button
+            onClick={() => window.open(generateKakaoMapUrl(), '_blank')}
+            className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
+          >
+            <span>카카오맵에서 크게 보기</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </button>
+
+          {/* 저장된 코스에서 온 경우와 새로 생성된 코스에서 온 경우를 구분 */}
+          {isFromSavedCourse ? (
+            // 저장된 코스에서 온 경우: 저장 삭제 버튼
+            <button
+              onClick={handleDeleteSavedCourse}
+              className="w-full bg-red-500 text-white font-semibold py-4 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>저장 삭제</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          ) : (
+            // 새로 생성된 코스에서 온 경우: 저장하기 버튼
+            <button
+              onClick={handleSaveCourse}
+              disabled={isSaved || isSaving}
+              className={`w-full font-semibold py-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+                isSaved 
+                  ? 'bg-green-500 text-white cursor-default' 
+                  : isSaving 
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-purple-500 text-white hover:bg-purple-600'
+              }`}
+            >
+              {isSaving ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>저장 중...</span>
+                </>
+              ) : isSaved ? (
+                <>
+                  <span>저장 완료</span>
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </>
+              ) : (
+                <>
+                  <span>코스 저장하기</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </>
+              )}
+            </button>
+          )}
+
+          <button
             onClick={onBack}
             className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors"
           >
-            다른 코스 선택
+            {isFromSavedCourse ? '메인으로 돌아가기' : '다른 코스 선택'}
           </button>
         </div>
       </div>
+
+      {/* 코스 이름 입력 모달 */}
+      {showSaveModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center" 
+          style={{ 
+            backgroundColor: 'transparent',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            touchAction: 'none'
+          }}
+          onClick={() => {
+            setShowSaveModal(false);
+            setCustomCourseName('');
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 w-80 mx-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">코스 이름 설정</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                코스 이름
+              </label>
+              <input
+                type="text"
+                value={customCourseName}
+                onChange={(e) => setCustomCourseName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="코스 이름을 입력해주세요"
+                maxLength={50}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                최대 50자까지 입력 가능합니다.
+              </p>
+            </div>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowSaveModal(false);
+                  setCustomCourseName('');
+                }}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleConfirmSave}
+                disabled={!customCourseName.trim()}
+                className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+                  customCourseName.trim()
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
