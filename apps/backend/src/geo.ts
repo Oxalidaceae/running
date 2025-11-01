@@ -74,35 +74,5 @@ export function divideLinePoints(start: LatLon, end: LatLon): LatLon[] {
 }
 
 
-// 테스트용: 현재 좌표에서 반경 5km 기준 12개 점 및 등분점 출력
-// npx ts-node src/geo.ts || npm start 명령어를 통해 실행 가능
-if (require.main === module) {
-  const start: LatLon = { lat: 37.5665, lon: 126.9780 }; // 서울 시청
-  const radius = 5000; // 5km (왕복 10km 코스)
-
-  const endpoints = circle12Points(start.lat, start.lon, radius);
-
-  console.log("=== 반경 12개 점 (30° 간격) ===");
-  endpoints.forEach((p, i) => console.log(`${i + 1}번 (${i * 30}°):`, p));
-
-  console.log("\n=== 각 점과의 3등분점 ===");
-  const courses = endpoints.map((end, i) => {
-    const midpoints = divideLinePoints(start, end);
-    console.log(`${i + 1}번 (${i * 30}°):`, midpoints);
-    return{
-      id: i+1,
-      angle: i * 30,
-      start,
-      end,
-      midpoints
-    };
-  });
-
-  const result = {
-    base: start, 
-    radius, 
-    courses
-  };
-  fs.writeFileSync("output.json", JSON.stringify(result, null, 2), "utf-8");
-  console.log("\n✅ 결과가 output.json 파일로 저장되었습니다!");
-}
+// 테스트용 코드는 src/main.ts로 이동되었습니다.
+// 실행: npx tsx src/main.ts
