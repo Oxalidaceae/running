@@ -42,10 +42,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 라우트 - 경로 중복 제거
-app.use(geolocationRouter);  // /api 제거 - 이미 geolocationRouter 내부에서 /geolocation, /reverse-geocode 정의
-app.use(elevationRouter);     // /api 제거
-app.use('/courses', coursesRouter);  // /api/courses -> /courses로 변경
+// 요청 로깅 미들웨어 (디버깅용)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// 라우트 - Vercel에서 /api/* 요청이 들어오므로 경로 설정
+app.use('/', geolocationRouter);     // /api/geolocation, /api/reverse-geocode
+app.use('/', elevationRouter);       // /api/elevation
+app.use('/courses', coursesRouter);  // /api/courses/generate
 
 // 헬스 체크
 app.get('/health', (req, res) => {
