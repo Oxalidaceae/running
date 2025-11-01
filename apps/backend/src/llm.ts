@@ -77,8 +77,7 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
       "elevationAnalysis": {
         "averageChange": 5.0,
         "totalAscent": 50.0,
-        "totalDescent": 45.0,
-        "changeFrequency": "낮음"
+        "totalDescent": 45.0
       },
       "scores": {
         "elevation": 9,
