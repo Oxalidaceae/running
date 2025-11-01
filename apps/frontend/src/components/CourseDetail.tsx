@@ -40,96 +40,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   onBack,
   isFromSavedCourse = false
 }) => {
-  const [addresses, setAddresses] = useState<{
-    start: string;
-    waypoint: string;
-    end: string;
-  }>({
-    start: '',
-    waypoint: '',
-    end: ''
-  });
-  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [customCourseName, setCustomCourseName] = useState('');
-
-  // 주소를 가져오는 함수
-  const fetchAddress = async (lat: number, lng: number): Promise<string> => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${lat}&lng=${lng}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.address) {
-          return data.address.road_address?.address_name || data.address.address_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        }
-      }
-      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-    } catch (error) {
-      console.error('주소 변환 오류:', error);
-      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-    }
-  };
-
-  // 코스 저장 상태 확인
-  useEffect(() => {
-    setIsSaved(isCourseAlreadySaved(userPosition, course.distance, course.waypoints));
-  }, [userPosition, course.distance, course.waypoints]);
-
-  // 모든 지점의 주소를 가져오기
-  useEffect(() => {
-    const fetchAllAddresses = async () => {
-      setIsLoadingAddresses(true);
-
-      try {
-        // 출발점 주소
-        const startAddress = await fetchAddress(userPosition.latitude, userPosition.longitude);
-
-        // 반환점 주소 (waypoints[0]이 실제로는 end 지점)
-        let waypointAddress = '';
-        if (course.waypoints.length > 0) {
-          waypointAddress = await fetchAddress(
-            course.waypoints[0].latitude,
-            course.waypoints[0].longitude
-          );
-        }
-
-        // 도착점 주소 (출발점과 동일)
-        const endAddress = startAddress;
-
-        setAddresses({
-          start: startAddress,
-          waypoint: waypointAddress,
-          end: endAddress
-        });
-      } catch (error) {
-        console.error('주소 조회 오류:', error);
-      } finally {
-        setIsLoadingAddresses(false);
-      }
-    };
-
-    fetchAllAddresses();
-  }, [course.waypoints, userPosition]);
-
-  // 카카오맵 경로 링크 생성 함수
-  const generateKakaoMapUrl = () => {
-    // 출발점 (현재 위치)
-    const start = `출발점,${userPosition.latitude},${userPosition.longitude}`;
-
-    // 경유지 (1개 - end 지점)
-    const waypoint = course.waypoints.length > 0
-      ? `경유지,${course.waypoints[0].latitude},${course.waypoints[0].longitude}`
-      : '';
-
-    // 도착점 (출발점으로 복귀 - 원형 코스)
-    const end = `도착점,${userPosition.latitude},${userPosition.longitude}`;
-
-    // 전체 경로 조합
-    const fullPath = waypoint ? `${start}/${waypoint}/${end}` : `${start}/${end}`;
-
-    return `https://map.kakao.com/link/by/walk/${fullPath}`;
+  // Tmap HTML URL 생성
+  const generateTmapUrl = () => {
+    if (course.waypoints.length === 0) return '';
+    
+    const params = new URLSearchParams({
+      origin: `${userPosition.latitude},${userPosition.longitude}`,
+      waypoint: `${course.waypoints[0].latitude},${course.waypoints[0].longitude}`,
+    });
+    
+    return `/src/components/tmap.html?${params.toString()}`;
   };
 
   // 저장 모달 열기
@@ -210,15 +130,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       </header>
 
       <div className="px-4 py-6 space-y-6">
-        {/* Kakao Map with Route */}
+        {/* Tmap with Route */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden h-80">
           <div className="relative h-full">
-            <iframe
-              src={generateKakaoMapUrl()}
-              className="w-full h-full border-0"
-              title="카카오맵 경로"
-              allowFullScreen
-            />
+            {course.waypoints.length > 0 ? (
+              <iframe
+                src={generateTmapUrl()}
+                className="w-full h-full border-0"
+                title="Tmap 경로"
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center bg-gray-50">
+                <p className="text-gray-500">경유지 정보가 없습니다.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -405,7 +330,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
           <button
             onClick={onBack}
-            className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
+            className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors"
           >
             {isFromSavedCourse ? '메인으로 돌아가기' : '다른 코스 선택'}
           </button>
