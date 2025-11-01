@@ -40,3 +40,5 @@ apps/frontend/metro.config.js.bak
 # Backup
 *-backup/
 *.backup
+.vercel
+.env*.local
