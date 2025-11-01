@@ -34,22 +34,22 @@ interface CourseRecommendationProps {
   onCourseSelect: (course: Course) => void;
 }
 
-const CourseRecommendation: React.FC<CourseRecommendationProps> = ({ 
-  distance, 
-  position, 
+const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
+  distance,
+  position,
   courses, // props로 받은 코스 데이터 사용
   onBack,
-  onCourseSelect 
+  onCourseSelect
 }) => {
   const [address, setAddress] = useState<string>('');
   const [isLoadingAddress, setIsLoadingAddress] = useState(true);
 
-    // 위치를 주소로 변환하는 함수
+  // 위치를 주소로 변환하는 함수
   const fetchAddress = useCallback(async () => {
     try {
       setIsLoadingAddress(true);
       const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.address) {
@@ -75,7 +75,7 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
   useEffect(() => {
     fetchAddress();
   }, [fetchAddress]);
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -118,7 +118,7 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
         {/* Course List */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">추천 코스</h3>
-          
+
           {courses.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               추천할 수 있는 코스가 없습니다.
@@ -133,23 +133,21 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">#{course.rank}</span>
-                      <span className="font-medium text-gray-700">{course.name}</span>
+                      <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">코스 {course.rank}</span>
                     </div>
                     <span className="text-sm text-blue-600">{course.distance}</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}</p>
                   <p className="text-xs text-gray-500 mb-2">{course.summary}</p>
-                  
+
                   {/* 고도 분석 정보 */}
                   <div className="flex space-x-4 text-xs text-gray-500 mb-2">
-                    <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
                     <span>상승: {course.elevationAnalysis.totalAscent}m</span>
-                    {course.elevationAnalysis.totalDescent > 0 && (
-                      <span>하강: {course.elevationAnalysis.totalDescent}m</span>
-                    )}
+                    <span>하강: {course.elevationAnalysis.totalDescent}m</span>
+                    <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
+
                   </div>
-                  
+
                   <div className="flex items-center justify-end mt-2">
                     <div className="text-right">
                       <div className="text-xs text-gray-500">평점</div>
@@ -160,6 +158,16 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
               ))}
             </div>
           )}
+          
+          {/* Back to Main Button */}
+          <div className="mt-6">
+            <button 
+              onClick={onBack}
+              className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              메인으로 돌아가기
+            </button>
+          </div>
         </div>
       </div>
     </div>

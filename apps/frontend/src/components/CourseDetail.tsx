@@ -32,27 +32,27 @@ interface CourseDetailProps {
   onBack: () => void;
 }
 
-const CourseDetail: React.FC<CourseDetailProps> = ({ 
-  course, 
-  userPosition, 
-  onBack 
+const CourseDetail: React.FC<CourseDetailProps> = ({
+  course,
+  userPosition,
+  onBack
 }) => {
   // 카카오맵 경로 링크 생성 함수
   const generateKakaoMapUrl = () => {
     // 출발점 (현재 위치)
     const start = `출발점,${userPosition.latitude},${userPosition.longitude}`;
-    
+
     // 경유지 (1개 - end 지점)
-    const waypoint = course.waypoints.length > 0 
+    const waypoint = course.waypoints.length > 0
       ? `경유지,${course.waypoints[0].latitude},${course.waypoints[0].longitude}`
       : '';
-    
+
     // 도착점 (출발점으로 복귀 - 원형 코스)
     const end = `도착점,${userPosition.latitude},${userPosition.longitude}`;
-    
+
     // 전체 경로 조합
     const fullPath = waypoint ? `${start}/${waypoint}/${end}` : `${start}/${end}`;
-    
+
     return `https://map.kakao.com/link/by/walk/${fullPath}`;
   };
   return (
@@ -104,28 +104,26 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 <span className="font-semibold text-blue-600">{course.scores.overall}/10</span>
               </div>
             </div>
-            
+
             {/* 고도 분석 정보 */}
             <div className="border-t pt-3">
               <h4 className="font-medium text-gray-700 mb-2">🏔️ 고도 분석</h4>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">평균 고도 변화:</span>
-                  <span className="font-medium">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">총 상승:</span>
                   <span className="font-medium text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
                 </div>
-                {course.elevationAnalysis.totalDescent > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">총 하강:</span>
-                    <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">총 하강:</span>
+                  <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">평균 고도 변화:</span>
+                  <span className="font-medium">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
+                </div>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 p-3 rounded-lg">
               <p className="text-sm text-gray-700">{course.summary}</p>
             </div>
@@ -165,7 +163,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 </p>
               </div>
             </div>
-            
+
             {/* 경유지 (1개) */}
             {course.waypoints.length > 0 && (
               <div className="flex items-center space-x-3">
@@ -180,7 +178,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 </div>
               </div>
             )}
-            
+
             {/* 도착점 (출발점 복귀) */}
             <div className="flex items-center space-x-3">
               <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
@@ -198,7 +196,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <button 
+          <button
             onClick={() => window.open(generateKakaoMapUrl(), '_blank')}
             className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
           >
@@ -207,8 +205,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </button>
-          
-          <button 
+
+          <button
             onClick={onBack}
             className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
           >
