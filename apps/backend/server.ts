@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
 
-// 먼저 .env.local 파일 로드
+// .env 파일 로드
+config({ path: '.env' });
+// .env.local 파일도 로드 (우선순위: .env.local > .env)
 config({ path: '.env.local' });
 
 import express from 'express';
