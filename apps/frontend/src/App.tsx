@@ -165,14 +165,11 @@ export default function App() {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button className="p-2">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <h1 className="text-xl font-semibold text-gray-800">오어달</h1>
-          <div className="w-10"></div> {/* Spacer for centering */}
+        <div className="flex items-center justify-center px-4 py-4">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl font-semibold text-gray-800">오어달</h1>
+            <span className="text-2xl">🏃‍♂️</span>
+          </div>
         </div>
       </header>
 
