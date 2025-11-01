@@ -70,6 +70,25 @@ app.get('/debug/env', (req, res) => {
   res.json(envVars);
 });
 
+// 404 핸들러 - 등록된 라우트가 없을 때
+app.use((req, res) => {
+  console.error(`[404] Route not found: ${req.method} ${req.url}`);
+  res.status(404).json({
+    error: 'Route not found',
+    path: req.url,
+    method: req.method,
+    registeredRoutes: [
+      'GET /health',
+      'GET /debug/env',
+      'POST /geolocation',
+      'GET /reverse-geocode',
+      'POST /elevation',
+      'GET /elevation/single',
+      'POST /courses/generate'
+    ]
+  });
+});
+
 export default (req: VercelRequest, res: VercelResponse) => {
   return app(req, res);
 };
