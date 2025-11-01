@@ -150,47 +150,45 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         {/* Course Info */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-gray-800">코스 정보</h3>
+            <h4 className="font-medium text-gray-700 mb-2">🚩 코스 정보</h4>
             <span className="bg-blue-500 text-white text-sm font-bold px-3 py-1 rounded-full">코스 {course.rank}</span>
           </div>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">거리:</span>
-                <span className="font-semibold text-blue-600">{course.distance}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">예상 시간:</span>
-                <span className="font-medium text-gray-800">{course.estimatedTime}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">평점:</span>
-                <span className="font-semibold text-blue-600">{course.scores.overall}/10</span>
-              </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">거리:</span>
+              <span className="font-semibold text-blue-600">{course.distance}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">예상 시간:</span>
+              <span className="font-semibold text-gray-800">{course.estimatedTime}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">평점:</span>
+              <span className="font-semibold text-blue-600">{course.scores.overall}/10</span>
+            </div>
+          </div>
 
-            {/* 고도 분석 정보 */}
-            <div className="border-t pt-3">
-              <h4 className="font-medium text-gray-700 mb-2">🏔️ 고도 분석</h4>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">총 상승:</span>
-                  <span className="font-medium text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">총 하강:</span>
-                  <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">평균 고도 변화:</span>
-                  <span className="font-medium">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
-                </div>
+          {/* 고도 분석 정보 */}
+          <div className="border-t pt-3 mt-3">
+            <h4 className="font-medium text-gray-700 mb-2">🏔️ 고도 분석</h4>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">총 상승:</span>
+                <span className="font-semibold text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">총 하강:</span>
+                <span className="font-semibold text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">평균 고도 변화:</span>
+                <span className="font-semibold text-gray-800">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
               </div>
             </div>
+          </div>
 
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-700">{course.summary}</p>
-            </div>
+          <div className="bg-gray-50 p-3 rounded-lg mt-3">
+            <p className="text-sm text-gray-700">{course.summary}</p>
           </div>
         </div>
 

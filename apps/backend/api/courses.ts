@@ -170,7 +170,7 @@ router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, r
       return {
         courseId: rec.courseId,
         rank: rec.rank,
-        name: `코스${rec.rank}`,
+        name: `코스 ${rec.rank}`,
         distance: `${distance} km`,
         estimatedTime: `${Math.round(distance * 5 + rec.rank)}분`,
         summary: rec.summary,

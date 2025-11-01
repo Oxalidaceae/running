@@ -142,8 +142,8 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
 
                   {/* 고도 분석 정보 */}
                   <div className="flex space-x-4 text-xs text-gray-500 mb-2">
-                    <span>상승: {course.elevationAnalysis.totalAscent}m</span>
-                    <span>하강: {course.elevationAnalysis.totalDescent}m</span>
+                    <span>총 상승: {course.elevationAnalysis.totalAscent}m</span>
+                    <span>총 하강: {course.elevationAnalysis.totalDescent}m</span>
                     <span>평균 고도 변화: {course.elevationAnalysis.averageChange}m</span>
 
                   </div>
