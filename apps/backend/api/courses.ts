@@ -34,11 +34,11 @@ router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, r
 
     console.log(`🏃 코스 생성 시작: 위치(${latitude}, ${longitude}), 거리: ${distance}km`);
 
-    // 전체 프로세스에 대한 타임아웃 설정 (8초)
+    // 전체 프로세스에 대한 타임아웃 설정 (50초 - Vercel 함수 타임아웃보다 짧게)
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('코스 생성 요청이 시간을 초과했습니다. 잠시 후 다시 시도해주세요.'));
-      }, 8000);
+      }, 50000);
     });
 
     const processPromise = (async () => {
