@@ -5,7 +5,8 @@
   "outputDirectory": "dist",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@3.2.29"
+      "runtime": "@vercel/node@3.2.29",
+      "maxDuration": 60
     }
   },
   "routes": [

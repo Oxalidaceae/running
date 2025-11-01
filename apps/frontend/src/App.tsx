@@ -112,7 +112,7 @@ export default function App() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 9900); // 9초 타임아웃
+      }, 55000); // 55초 타임아웃 (Vercel 함수 타임아웃 60초보다 짧게)
 
       const response = await fetch('/api/courses/generate', {
         method: 'POST',
