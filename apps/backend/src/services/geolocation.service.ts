@@ -1,10 +1,11 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
-// 백엔드 루트의 .env.local 파일 로드
-config({ path: resolve(process.cwd(), '.env.local') });
-// 현재 파일 위치 기준으로 .env.local 찾기
-//config({ path: resolve(__dirname, '../../.env.local') });
+// 로컬 개발 환경에서만 .env.local 파일 로드
+// Vercel에서는 환경 변수가 자동으로 process.env에 주입됨
+if (process.env.NODE_ENV !== 'production') {
+  config({ path: resolve(process.cwd(), '.env.local') });
+}
 
 export interface Position {
   latitude: number;
