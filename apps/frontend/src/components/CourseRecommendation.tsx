@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import type { Position } from '../types';
+import { API_BASE_URL } from '../constants';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -48,7 +49,7 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
   const fetchAddress = useCallback(async () => {
     try {
       setIsLoadingAddress(true);
-      const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
+      const response = await fetch(`${API_BASE_URL}/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
 
       if (response.ok) {
         const data = await response.json();
