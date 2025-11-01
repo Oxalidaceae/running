@@ -12,7 +12,7 @@
     "dev:backend": "npm run dev --workspace=@running/backend",
     "generate-courses": "npm run generate-courses --workspace=@running/backend",
     "build": "npm run build --workspaces",
-    "vercel-build": "npm run build --workspace=@running/frontend",
+    "vercel-build": "npm run build --workspace=@running/frontend && rm -rf dist && mkdir -p dist && cp -R apps/frontend/dist/. dist/",
     "lint": "npm run lint --workspace=@running/frontend"
   },
   "devDependencies": {
