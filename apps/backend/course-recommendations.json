@@ -1,14 +1,14 @@
 {
   "recommendations": [
     {
-      "courseId": 10,
+      "courseId": 8,
       "rank": 1,
-      "summary": "고도 변화가 거의 없는 평탄한 코스",
-      "reason": "이 코스는 중간 지점들의 고도 변화가 매우 적고, 전반적으로 평탄한 지형을 유지합니다. 따라서 초보자도 부담 없이 완주할 수 있는 코스입니다. 고도 변화가 적어 안정적인 러닝 경험을 제공합니다.",
+      "summary": "고도 변화가 적고 완만한 초보자 맞춤 코스",
+      "reason": "이 코스는 중간 지점들의 고도 변화가 매우 적어 완만합니다. 연속된 지점 간 고도 차이의 절댓값 평균이 낮고, 오르막과 내리막의 전환이 거의 없어 초보 러너에게 적합합니다. 전체적으로 안정적인 고도를 유지하므로 부담 없이 러닝을 즐길 수 있습니다.",
       "elevationAnalysis": {
-        "averageChange": 1.27,
-        "totalAscent": 0,
-        "totalDescent": 3.34
+        "averageChange": 0.94,
+        "totalAscent": 2.54,
+        "totalDescent": 2.01
       },
       "scores": {
         "elevation": 9.5,
@@ -16,14 +16,14 @@
       }
     },
     {
-      "courseId": 9,
+      "courseId": 7,
       "rank": 2,
-      "summary": "전반적으로 완만한 내리막길 위주의 코스",
-      "reason": "이 코스는 중간 지점들의 고도가 비교적 안정적이며, 완만한 내리막길 위주로 구성되어 있어 초보 러너에게 적합합니다. 급격한 고도 변화가 없어 편안하게 러닝을 즐길 수 있습니다.",
+      "summary": "부드러운 고도 변화가 돋보이는 평탄한 코스",
+      "reason": "이 코스는 중간 지점들의 고도가 비교적 안정적입니다. 고도 변화의 폭이 크지 않고, 오르막 내리막이 심하지 않아 편안하게 달릴 수 있습니다. 중간 지점들의 고도 값들이 안정적으로 유지되므로, 초보자도 쉽게 완주할 수 있는 코스입니다.",
       "elevationAnalysis": {
-        "averageChange": 3.1,
-        "totalAscent": 4.66,
-        "totalDescent": 13.52
+        "averageChange": 8.32,
+        "totalAscent": 11.75,
+        "totalDescent": 16.98
       },
       "scores": {
         "elevation": 9,
@@ -31,14 +31,14 @@
       }
     },
     {
-      "courseId": 8,
+      "courseId": 6,
       "rank": 3,
-      "summary": "부드러운 경사로 이루어진 평이한 코스",
-      "reason": "이 코스는 중간 지점들의 고도 변화가 크지 않고, 부드러운 경사로 이루어져 있습니다. 급격한 오르막이나 내리막이 없어 초보자도 쉽게 적응할 수 있으며, 꾸준한 페이스 유지가 가능합니다.",
+      "summary": "전체적으로 안정적인 고도를 유지하는 코스",
+      "reason": "이 코스는 중간 지점들의 고도 변화가 크지 않아 비교적 평탄합니다. 연속된 지점 간 고도 차이가 작고, 급격한 오르막 내리막이 없어 초보자에게 적합합니다. 전체적으로 안정적인 고도를 유지하므로 편안하게 러닝을 즐길 수 있습니다.",
       "elevationAnalysis": {
-        "averageChange": 4.5,
-        "totalAscent": 0,
-        "totalDescent": 13.67
+        "averageChange": 7.35,
+        "totalAscent": 17.89,
+        "totalDescent": 28.27
       },
       "scores": {
         "elevation": 8.5,
