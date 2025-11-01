@@ -69,11 +69,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   useEffect(() => {
     const fetchAllAddresses = async () => {
       setIsLoadingAddresses(true);
-      
+
       try {
         // 출발점 주소
         const startAddress = await fetchAddress(userPosition.latitude, userPosition.longitude);
-        
+
         // 반환점 주소 (waypoints[0]이 실제로는 end 지점)
         let waypointAddress = '';
         if (course.waypoints.length > 0) {
@@ -82,10 +82,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             course.waypoints[0].longitude
           );
         }
-        
+
         // 도착점 주소 (출발점과 동일)
         const endAddress = startAddress;
-        
+
         setAddresses({
           start: startAddress,
           waypoint: waypointAddress,
@@ -162,7 +162,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">예상 시간:</span>
                 <span className="font-medium text-gray-800">{course.estimatedTime}</span>
-                <span className="text-gray-600">(평균페이스 5분 기준)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">평점:</span>

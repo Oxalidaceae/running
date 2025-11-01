@@ -10,6 +10,33 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
     { apiVersion: "v1" }
   );
 
+  // 재시도 로직 구현
+  const maxRetries = 2;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🎯 AI 추천 시도 ${attempt}/${maxRetries}`);
+      const result = await attemptRecommendation(model, courses);
+      
+      // JSON 파일로 저장
+      if (outputPath) {
+        await writeFile(outputPath, JSON.stringify(result, null, 2), "utf-8");
+        console.log(`✅ 추천 결과가 저장되었습니다: ${outputPath}`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`❌ 시도 ${attempt} 실패:`, error instanceof Error ? error.message : error);
+      if (attempt === maxRetries) {
+        throw error; // 마지막 시도에서도 실패하면 에러 던지기
+      }
+      console.log(`🔄 ${attempt + 1}번째 시도를 준비합니다...`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1초 대기
+    }
+  }
+}
+
+async function attemptRecommendation(model: any, courses: any[]) {
+
   // 모델 응답에서 첫 번째 JSON 오브젝트만 안전하게 추출하는 유틸
   function extractFirstJsonObject(text: string): string | null {
     // 1) 코드 블록 안의 JSON 우선 추출
@@ -65,16 +92,21 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
 - 급격한 오르막/내리막 전환이 적은 코스
 - midpoints의 elevation 값들이 안정적인 코스
 
+추천 이유 작성 지침:
+- 각 코스의 고도 변화 패턴을 구체적으로 언급하세요.
+- 영어 키워드 대신 한국어로 작성하세요.
+- 내부적인 정보 (ex: 코스7) 대신에 일반적인 정보(이 코스)로 설명하세요.
+
 **상위 3개 코스만 추천하세요.**
 
-응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만, 첫 글자는 {, 마지막 글자는 } 이어야 함. 숫자 필드는 숫자 타입으로, 단위를 m 단위로 붙여주세요):
+응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만, 첫 글자는 {, 마지막 글자는 } 이어야 함. 숫자 필드는 반드시 숫자만 입력하고 단위는 붙이지 마세요):
 {
   "recommendations": [
     {
       "courseId": 1,
       "rank": 1,
       "summary": "코스 한 줄 요약",
-      "reason": "추천 이유 (이 코스는 [midpoints 고도 변화 패턴 구체적으로])",
+      "reason": "추천 이유 (이 코스는 ~ )",
       "elevationAnalysis": {
         "averageChange": 5.0,
         "totalAscent": 50.0,
@@ -94,16 +126,22 @@ ${JSON.stringify(courses, null, 2)}
 
   const result = await model.generateContent(prompt);
   const text = result.response.text();
+  
+  console.log('🤖 AI 원본 응답 (처음 500자):', text.substring(0, 500));
 
   const extracted = extractFirstJsonObject(text.trim());
   if (!extracted) {
+    console.error('❌ JSON 추출 실패. 원본 텍스트:', text);
     throw new Error("JSON 형식의 응답을 찾지 못했습니다.");
   }
+  
+  console.log('📋 추출된 JSON:', extracted.substring(0, 200) + '...');
 
   let recommendation: any;
   try {
     recommendation = JSON.parse(extracted);
   } catch (e) {
+    console.error('❌ JSON 파싱 실패. 추출된 텍스트:', extracted);
     throw new Error(`모델 응답 JSON 파싱 실패: ${(e as Error).message}`);
   }
 
@@ -112,11 +150,6 @@ ${JSON.stringify(courses, null, 2)}
     recommendation.recommendations = recommendation.recommendations.slice(0, 3);
   }
   
-  // JSON 파일로 저장
-  if (outputPath) {
-    await writeFile(outputPath, JSON.stringify(recommendation, null, 2), "utf-8");
-    console.log(`✅ 추천 결과가 저장되었습니다: ${outputPath}`);
-  }
   
   return recommendation;
 }

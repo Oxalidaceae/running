@@ -1,14 +1,14 @@
 {
   "recommendations": [
     {
-      "courseId": 6,
+      "courseId": 7,
       "rank": 1,
-      "summary": "가장 평탄하고 고도 변화가 거의 없는 이상적인 초보자 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.165m로 모든 코스 중 가장 낮습니다. 총 상승 고도는 0.33m이고 하강 고도는 없으며, 오르막-내리막 전환 없이 완만한 오르막만 있어 고도 변화의 일관성이 매우 뛰어납니다. 초보 러너가 안정적으로 완주하기에 최적화된 코스입니다.",
+      "summary": "고도 변화가 거의 없는 평탄한 코스",
+      "reason": "이 코스는 중간 지점들의 고도가 17.46m, 13.72m, 11.24m로 매우 안정적이며, 전체적으로 완만한 내리막길을 이루고 있습니다. 급격한 고도 변화가 없어 초보 러너에게 적합합니다.",
       "elevationAnalysis": {
-        "averageChange": 0.165,
-        "totalAscent": 0.33,
-        "totalDescent": 0
+        "averageChange": 2.48,
+        "totalAscent": 0,
+        "totalDescent": 6.22
       },
       "scores": {
         "elevation": 10,
@@ -16,33 +16,33 @@
       }
     },
     {
-      "courseId": 1,
+      "courseId": 8,
       "rank": 2,
-      "summary": "고도 변화가 매우 적고 완만한, 초보자에게 친숙한 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.315m로 두 번째로 낮으며, 총 상승 고도는 0.15m, 총 하강 고도는 0.48m입니다. 단 한 번의 오르막-내리막 전환(내리막 후 오르막)이 있지만, 그 변화 폭이 매우 작아 러닝에 거의 부담을 주지 않습니다. 전반적으로 평탄하여 초보자에게 매우 적합합니다.",
+      "summary": "안정적인 고도를 유지하는 완만한 코스",
+      "reason": "이 코스는 중간 지점들의 고도가 18.33m, 18.63m, 16.52m로 큰 변화 없이 유지됩니다. 약간의 오르막과 내리막이 있지만, 평균 고도 변화량이 적어 초보 러너도 쉽게 완주할 수 있습니다.",
       "elevationAnalysis": {
-        "averageChange": 0.315,
-        "totalAscent": 0.15,
-        "totalDescent": 0.48
+        "averageChange": 1.055,
+        "totalAscent": 0.3,
+        "totalDescent": 2.11
       },
       "scores": {
         "elevation": 9,
-        "overall": 9
+        "overall": 8
       }
     },
     {
-      "courseId": 7,
+      "courseId": 12,
       "rank": 3,
-      "summary": "꾸준하고 완만한 오르막이 특징인 일관성 있는 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.435m로 낮으며, 총 상승 고도는 0.87m이지만 하강 고도는 전혀 없어 오르막-내리막 전환이 없습니다. 이는 고도 변화의 일관성이 매우 뛰어나다는 것을 의미합니다. 완만한 오르막이 지속되지만, 변화 폭이 크지 않아 초보자도 안정적인 페이스로 완주할 수 있습니다.",
+      "summary": "전체적으로 평이한 고도 변화를 보이는 코스",
+      "reason": "이 코스는 중간 지점들의 고도가 20.51m, 20.36m, 21.91m로 안정적인 수준을 유지합니다. 약간의 고도 변화는 있지만, 전체적으로 완만하여 초보 러너에게 적합합니다.",
       "elevationAnalysis": {
-        "averageChange": 0.435,
-        "totalAscent": 0.87,
-        "totalDescent": 0
+        "averageChange": 0.775,
+        "totalAscent": 1.55,
+        "totalDescent": 0.15
       },
       "scores": {
-        "elevation": 9,
-        "overall": 8.8
+        "elevation": 8,
+        "overall": 7.5
       }
     }
   ]
