@@ -1,0 +1,30 @@
+{
+  "name": "@running/backend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "generate-courses": "tsx src/main.ts",
+    "add-elevation": "tsx src/add-elevation.ts",
+    "add-address": "tsx src/add-address.ts",
+    "create-simple-address": "tsx src/create-simple-address.ts",
+    "add-all": "tsx src/add-all.ts",
+    "recommend": "tsx src/recommend.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^24.6.0",
+    "tsx": "^4.7.0",
+    "typescript": "~5.9.3"
+  }
+}
