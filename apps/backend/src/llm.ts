@@ -66,7 +66,7 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
 
 **상위 3개 코스만 추천하세요.**
 
-응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만, 첫 글자는 {, 마지막 글자는 } 이어야 함. 숫자 필드는 숫자 타입으로, 단위를 붙이지 마세요):
+응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만, 첫 글자는 {, 마지막 글자는 } 이어야 함. 숫자 필드는 숫자 타입으로, 단위를 m 단위로 붙여주세요):
 {
   "recommendations": [
     {

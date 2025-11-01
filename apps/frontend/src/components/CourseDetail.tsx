@@ -123,16 +123,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">평균 고도 변화:</span>
-                  <span className="font-medium">{course.elevationAnalysis.averageChange}m</span>
+                  <span className="font-medium">{course.elevationAnalysis.averageChange.toFixed(2)}m</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">총 상승:</span>
-                  <span className="font-medium text-red-500">{course.elevationAnalysis.totalAscent}m</span>
+                  <span className="font-medium text-red-500">{course.elevationAnalysis.totalAscent.toFixed(2)}m</span>
                 </div>
                 {course.elevationAnalysis.totalDescent > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">총 하강:</span>
-                    <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent}m</span>
+                    <span className="font-medium text-blue-500">{course.elevationAnalysis.totalDescent.toFixed(2)}m</span>
                   </div>
                 )}
               </div>

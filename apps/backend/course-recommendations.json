@@ -1,48 +1,48 @@
 {
   "recommendations": [
     {
-      "courseId": 12,
+      "courseId": 8,
       "rank": 1,
-      "summary": "완만한 내리막이 이어지는 안정적인 코스",
-      "reason": "midpoints 고도가 [34.51, 27.19, 24.43]로, 첫 번째 구간에서 7.32 하강하고 다음 구간에서 2.76 하강하는 연속적인 내리막 경사를 보여 고도 변화의 빈도가 0입니다. 평균 고도 변화량이 5.04로 낮고, 총 하강이 10.08로 완만한 내리막길이 이어져 꾸준한 페이스 유지가 가능한 안정적인 코스입니다. 급격한 변화 없이 일관된 경사로 초보 러너에게 적합합니다.",
+      "summary": "가장 완만한 고도 변화를 보이는 코스로, 미미한 경사 변화를 포함합니다.",
+      "reason": "midpoints 간 평균 고도 변화량이 1.96m로 모든 코스 중 가장 낮아 매우 완만합니다. 고도 변화폭 자체가 작아 초보자에게 부담이 적고 안정적인 러닝 경험을 제공합니다. (1번의 하강-상승 전환이 있지만, 변화폭이 매우 작습니다.)",
       "elevationAnalysis": {
-        "averageChange": 5.04,
-        "totalAscent": 0,
-        "totalDescent": 10.08
+        "averageChange": 1.96,
+        "totalAscent": 2.99,
+        "totalDescent": 0.92
       },
       "scores": {
-        "elevation": 6.56,
-        "overall": 9.56
+        "elevation": 10,
+        "overall": 9.6
+      }
+    },
+    {
+      "courseId": 12,
+      "rank": 2,
+      "summary": "고도 변화가 적고 일관된 하강 경사를 유지하는 완만한 코스입니다.",
+      "reason": "midpoints 간 평균 고도 변화량이 4.94m로 매우 낮으며, 오르막-내리막 전환 없이 지속적으로 하강하는 경사 패턴을 보여 일관성이 뛰어납니다. 급격한 변화가 없어 초보자도 안정적으로 완주할 수 있는 완만한 코스입니다.",
+      "elevationAnalysis": {
+        "averageChange": 4.94,
+        "totalAscent": 0,
+        "totalDescent": 9.88
+      },
+      "scores": {
+        "elevation": 10,
+        "overall": 9.6
       }
     },
     {
       "courseId": 11,
-      "rank": 2,
-      "summary": "완만한 오르막이 이어지는 안정적인 코스",
-      "reason": "midpoints 고도가 [20.91, 21.21, 31.71]로, 첫 번째 구간에서 0.3 상승하고 다음 구간에서 10.5 상승하는 연속적인 오르막 경사를 보여 고도 변화의 빈도가 0입니다. 평균 고도 변화량이 5.4로 낮고, 총 상승이 10.8로 완만한 오르막길이 이어져 페이스를 조절하며 달리기 좋은 안정적인 코스입니다. 일관된 경사로 급격한 부담 없이 훈련하기에 좋습니다.",
+      "rank": 3,
+      "summary": "전반적으로 완만한 상승 경사를 보이는, 안정적인 코스입니다.",
+      "reason": "midpoints 간 평균 고도 변화량이 6.01m로 낮으며, 오르막-내리막 전환 없이 완만한 상승 경사를 유지합니다. 러닝 중 예상치 못한 급격한 고도 변화가 없어 초보자에게 적합하며, 꾸준한 경사를 선호하는 러너에게도 좋습니다.",
       "elevationAnalysis": {
-        "averageChange": 5.4,
-        "totalAscent": 10.8,
+        "averageChange": 6.01,
+        "totalAscent": 12.01,
         "totalDescent": 0
       },
       "scores": {
-        "elevation": 6.51,
-        "overall": 9.51
-      }
-    },
-    {
-      "courseId": 8,
-      "rank": 3,
-      "summary": "고도 변화가 가장 적은 매우 평탄한 코스",
-      "reason": "midpoints 고도가 [19.34, 18.7, 21.2]로, 첫 번째 구간에서 0.64 미세하게 하강하고 다음 구간에서 2.5 상승하는 매우 적은 고도 변화를 보입니다. 평균 고도 변화량이 1.57로 모든 코스 중 가장 낮으며, 총 누적 상승/하강도 3.14에 불과하여 초보자에게 이상적인 평탄한 코스입니다. 거의 평지에 가까워 부담 없이 달릴 수 있습니다.",
-      "elevationAnalysis": {
-        "averageChange": 1.57,
-        "totalAscent": 2.5,
-        "totalDescent": 0.64
-      },
-      "scores": {
-        "elevation": 7,
-        "overall": 8.5
+        "elevation": 9,
+        "overall": 9.44
       }
     }
   ]
