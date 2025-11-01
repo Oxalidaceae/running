@@ -89,6 +89,7 @@ app.use((req, res) => {
   });
 });
 
-export default (req: VercelRequest, res: VercelResponse) => {
+// Vercel Serverless Function 핸들러
+module.exports = (req: VercelRequest, res: VercelResponse) => {
   return app(req, res);
 };
