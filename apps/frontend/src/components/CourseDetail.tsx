@@ -37,23 +37,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   userPosition,
   onBack
 }) => {
-  // 카카오맵 경로 링크 생성 함수
-  const generateKakaoMapUrl = () => {
-    // 출발점 (현재 위치)
-    const start = `출발점,${userPosition.latitude},${userPosition.longitude}`;
-
-    // 경유지 (1개 - end 지점)
-    const waypoint = course.waypoints.length > 0
-      ? `경유지,${course.waypoints[0].latitude},${course.waypoints[0].longitude}`
-      : '';
-
-    // 도착점 (출발점으로 복귀 - 원형 코스)
-    const end = `도착점,${userPosition.latitude},${userPosition.longitude}`;
-
-    // 전체 경로 조합
-    const fullPath = waypoint ? `${start}/${waypoint}/${end}` : `${start}/${end}`;
-
-    return `https://map.kakao.com/link/by/walk/${fullPath}`;
+  // Tmap HTML URL 생성
+  const generateTmapUrl = () => {
+    if (course.waypoints.length === 0) return '';
+    
+    const params = new URLSearchParams({
+      origin: `${userPosition.latitude},${userPosition.longitude}`,
+      waypoint: `${course.waypoints[0].latitude},${course.waypoints[0].longitude}`,
+    });
+    
+    return `/src/components/tmap.html?${params.toString()}`;
   };
   return (
     <div className="min-h-screen bg-gray-100">
@@ -71,15 +64,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       </header>
 
       <div className="px-4 py-6 space-y-6">
-        {/* Kakao Map with Route */}
+        {/* Tmap with Route */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden h-80">
           <div className="relative h-full">
-            <iframe
-              src={generateKakaoMapUrl()}
-              className="w-full h-full border-0"
-              title="카카오맵 경로"
-              allowFullScreen
-            />
+            {course.waypoints.length > 0 ? (
+              <iframe
+                src={generateTmapUrl()}
+                className="w-full h-full border-0"
+                title="Tmap 경로"
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center bg-gray-50">
+                <p className="text-gray-500">경유지 정보가 없습니다.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -197,18 +195,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         {/* Action Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => window.open(generateKakaoMapUrl(), '_blank')}
-            className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
-          >
-            <span>카카오맵에서 크게 보기</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </button>
-
-          <button
             onClick={onBack}
-            className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
+            className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors"
           >
             다른 코스 선택
           </button>

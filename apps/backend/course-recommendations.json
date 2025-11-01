@@ -1,48 +1,48 @@
 {
   "recommendations": [
     {
-      "courseId": 6,
+      "courseId": 8,
       "rank": 1,
-      "summary": "가장 평탄하고 고도 변화가 거의 없는 이상적인 초보자 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.165m로 모든 코스 중 가장 낮습니다. 총 상승 고도는 0.33m이고 하강 고도는 없으며, 오르막-내리막 전환 없이 완만한 오르막만 있어 고도 변화의 일관성이 매우 뛰어납니다. 초보 러너가 안정적으로 완주하기에 최적화된 코스입니다.",
+      "summary": "고도 변화가 거의 없는 평탄한 코스",
+      "reason": "midpoints의 고도 변화가 매우 적고, 전체적으로 안정적인 고도를 유지합니다. 19.34m, 18.71m, 21.19m로, 평균 고도 변화량은 1.51m입니다. 오르막-내리막 전환도 적어 초보자에게 적합합니다.",
       "elevationAnalysis": {
-        "averageChange": 0.165,
-        "totalAscent": 0.33,
-        "totalDescent": 0
+        "averageChange": 1.51,
+        "totalAscent": 2.48,
+        "totalDescent": 1.11
       },
       "scores": {
-        "elevation": 10,
-        "overall": 9.5
-      }
-    },
-    {
-      "courseId": 1,
-      "rank": 2,
-      "summary": "고도 변화가 매우 적고 완만한, 초보자에게 친숙한 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.315m로 두 번째로 낮으며, 총 상승 고도는 0.15m, 총 하강 고도는 0.48m입니다. 단 한 번의 오르막-내리막 전환(내리막 후 오르막)이 있지만, 그 변화 폭이 매우 작아 러닝에 거의 부담을 주지 않습니다. 전반적으로 평탄하여 초보자에게 매우 적합합니다.",
-      "elevationAnalysis": {
-        "averageChange": 0.315,
-        "totalAscent": 0.15,
-        "totalDescent": 0.48
-      },
-      "scores": {
-        "elevation": 9,
+        "elevation": 9.5,
         "overall": 9
       }
     },
     {
       "courseId": 7,
-      "rank": 3,
-      "summary": "꾸준하고 완만한 오르막이 특징인 일관성 있는 코스입니다.",
-      "reason": "midpoints 간 평균 고도 변화량이 0.435m로 낮으며, 총 상승 고도는 0.87m이지만 하강 고도는 전혀 없어 오르막-내리막 전환이 없습니다. 이는 고도 변화의 일관성이 매우 뛰어나다는 것을 의미합니다. 완만한 오르막이 지속되지만, 변화 폭이 크지 않아 초보자도 안정적인 페이스로 완주할 수 있습니다.",
+      "rank": 2,
+      "summary": "부드러운 고도 변화가 특징인 안정적인 코스",
+      "reason": "midpoints의 고도가 20.84m, 32.6m, 15.67m로, 비교적 완만한 변화를 보입니다. 평균 고도 변화량은 10.83m이며, 오르막과 내리막이 번갈아 나타나지만 그 폭이 크지 않아 초보 러너에게 적합합니다.",
       "elevationAnalysis": {
-        "averageChange": 0.435,
-        "totalAscent": 0.87,
-        "totalDescent": 0
+        "averageChange": 10.83,
+        "totalAscent": 11.76,
+        "totalDescent": 16.93
       },
       "scores": {
         "elevation": 9,
         "overall": 8.8
+      }
+    },
+    {
+      "courseId": 10,
+      "rank": 3,
+      "summary": "전체적으로 평이한 고도 흐름을 보이는 코스",
+      "reason": "midpoints의 고도가 21.22m, 36.09m, 26.94m로, 평균 고도 변화량은 9.56m입니다. 오르막과 내리막이 있지만, 비교적 안정적인 흐름을 보여 러닝에 적합합니다.",
+      "elevationAnalysis": {
+        "averageChange": 9.56,
+        "totalAscent": 14.87,
+        "totalDescent": 9.15
+      },
+      "scores": {
+        "elevation": 8.5,
+        "overall": 8.3
       }
     }
   ]
