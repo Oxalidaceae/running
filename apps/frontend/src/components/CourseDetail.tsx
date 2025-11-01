@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Position } from '../types';
 
 interface ElevationAnalysis {
@@ -37,6 +37,70 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   userPosition,
   onBack
 }) => {
+  const [addresses, setAddresses] = useState<{
+    start: string;
+    waypoint: string;
+    end: string;
+  }>({
+    start: '',
+    waypoint: '',
+    end: ''
+  });
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+
+  // 주소를 가져오는 함수
+  const fetchAddress = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${lat}&lng=${lng}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.address) {
+          return data.address.road_address?.address_name || data.address.address_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+      }
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    } catch (error) {
+      console.error('주소 변환 오류:', error);
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+  };
+
+  // 모든 지점의 주소를 가져오기
+  useEffect(() => {
+    const fetchAllAddresses = async () => {
+      setIsLoadingAddresses(true);
+      
+      try {
+        // 출발점 주소
+        const startAddress = await fetchAddress(userPosition.latitude, userPosition.longitude);
+        
+        // 반환점 주소 (waypoints[0]이 실제로는 end 지점)
+        let waypointAddress = '';
+        if (course.waypoints.length > 0) {
+          waypointAddress = await fetchAddress(
+            course.waypoints[0].latitude,
+            course.waypoints[0].longitude
+          );
+        }
+        
+        // 도착점 주소 (출발점과 동일)
+        const endAddress = startAddress;
+        
+        setAddresses({
+          start: startAddress,
+          waypoint: waypointAddress,
+          end: endAddress
+        });
+      } catch (error) {
+        console.error('주소 조회 오류:', error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAllAddresses();
+  }, [course.waypoints, userPosition]);
+
   // 카카오맵 경로 링크 생성 함수
   const generateKakaoMapUrl = () => {
     // 출발점 (현재 위치)
@@ -156,24 +220,32 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">S</span>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">출발점</p>
                 <p className="text-xs text-gray-500">
-                  {userPosition.latitude.toFixed(4)}, {userPosition.longitude.toFixed(4)}
+                  {isLoadingAddresses ? (
+                    <span className="text-gray-400">주소 조회 중...</span>
+                  ) : (
+                    addresses.start
+                  )}
                 </p>
               </div>
             </div>
 
-            {/* 경유지 (1개) */}
+            {/* 반환점 */}
             {course.waypoints.length > 0 && (
               <div className="flex items-center space-x-3">
                 <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">M</span>
+                  <span className="text-white text-xs font-bold">T</span>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-800">경유지</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">반환점</p>
                   <p className="text-xs text-gray-500">
-                    {course.waypoints[0].latitude.toFixed(4)}, {course.waypoints[0].longitude.toFixed(4)}
+                    {isLoadingAddresses ? (
+                      <span className="text-gray-400">주소 조회 중...</span>
+                    ) : (
+                      addresses.waypoint
+                    )}
                   </p>
                 </div>
               </div>
@@ -184,10 +256,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">E</span>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">도착점 (출발점 복귀)</p>
                 <p className="text-xs text-gray-500">
-                  {userPosition.latitude.toFixed(4)}, {userPosition.longitude.toFixed(4)}
+                  {isLoadingAddresses ? (
+                    <span className="text-gray-400">주소 조회 중...</span>
+                  ) : (
+                    addresses.end
+                  )}
                 </p>
               </div>
             </div>
