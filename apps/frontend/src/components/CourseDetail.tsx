@@ -98,6 +98,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">예상 시간:</span>
                 <span className="font-medium text-gray-800">{course.estimatedTime}</span>
+                <span className="text-gray-600">(평균페이스 5분 기준)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">평점:</span>

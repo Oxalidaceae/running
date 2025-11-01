@@ -137,7 +137,7 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
                     </div>
                     <span className="text-sm text-blue-600">{course.distance}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime}</p>
+                  <p className="text-sm text-gray-600 mb-1">예상 시간: {course.estimatedTime} (평균페이스 5분 기준) </p>
                   <p className="text-xs text-gray-500 mb-2">{course.summary}</p>
 
                   {/* 고도 분석 정보 */}
