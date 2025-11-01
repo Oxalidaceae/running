@@ -161,18 +161,25 @@ router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, r
 
     console.log('✅ AI 추천 완료');
 
-    // 6. 파일 저장 (선택적 - 디버깅용)
-    const outputDir = path.resolve(process.cwd());
-    fs.writeFileSync(
-      path.join(outputDir, 'output-complete.json'), 
-      JSON.stringify(completeData, null, 2), 
-      'utf-8'
-    );
-    fs.writeFileSync(
-      path.join(outputDir, 'course-recommendations.json'), 
-      JSON.stringify(recommendations, null, 2), 
-      'utf-8'
-    );
+    // 6. 파일 저장 (로컬 환경에서만 - Vercel은 읽기 전용 파일 시스템)
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const outputDir = path.resolve(process.cwd());
+        fs.writeFileSync(
+          path.join(outputDir, 'output-complete.json'), 
+          JSON.stringify(completeData, null, 2), 
+          'utf-8'
+        );
+        fs.writeFileSync(
+          path.join(outputDir, 'course-recommendations.json'), 
+          JSON.stringify(recommendations, null, 2), 
+          'utf-8'
+        );
+        console.log('📁 디버깅 파일 저장 완료');
+      } catch (error) {
+        console.warn('⚠️ 파일 저장 실패 (무시됨):', error);
+      }
+    }
 
     // 7. 프론트엔드용 데이터 형식으로 변환
     const coursesForFrontend = recommendations.recommendations.map((rec: any) => {
