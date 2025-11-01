@@ -54,7 +54,7 @@ export default function App() {
   const fetchAddress = async (lat: number, lng: number) => {
     try {
       setIsLoadingAddress(true);
-      const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${lat}&lng=${lng}`);
+      const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -114,7 +114,7 @@ export default function App() {
         controller.abort();
       }, 9900); // 9초 타임아웃
 
-      const response = await fetch('http://localhost:3000/api/courses/generate', {
+      const response = await fetch('/api/courses/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

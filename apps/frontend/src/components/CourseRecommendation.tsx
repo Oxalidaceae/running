@@ -48,7 +48,7 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
   const fetchAddress = useCallback(async () => {
     try {
       setIsLoadingAddress(true);
-      const response = await fetch(`http://localhost:3000/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
+      const response = await fetch(`/api/reverse-geocode?lat=${position.latitude}&lng=${position.longitude}`);
 
       if (response.ok) {
         const data = await response.json();
