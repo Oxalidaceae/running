@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "buildCommand": "cd apps/frontend && npm run build",
   "outputDirectory": "apps/frontend/dist",
   "functions": {
     "api/index.ts": {
@@ -14,7 +15,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/apps/frontend/dist/$1"
+      "dest": "/$1"
     }
   ],
   "env": {
