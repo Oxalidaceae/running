@@ -41,6 +41,7 @@ export default function App() {
   const [courses, setCourses] = useState<Course[]>([]) // 코스 데이터를 App에서 관리
   const [address, setAddress] = useState<string>('')
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
+  const [locationRetryKey, setLocationRetryKey] = useState(0) // 위치 재시도를 위한 키
 
   // 위치를 주소로 변환하는 함수
   const fetchAddress = async (lat: number, lng: number) => {
@@ -181,7 +182,17 @@ export default function App() {
             <div className="h-full flex items-center justify-center">
               <div className="text-center text-gray-500">
                 <p className="text-red-500 mb-2">⚠️ 지도를 불러올 수 없습니다</p>
-                <p className="text-sm">{error}</p>
+                <p className="text-sm mb-4">{error}</p>
+                <button
+                  onClick={() => {
+                    console.log('🔄 위치 정보 재시도 요청');
+                    setLocationRetryKey(prev => prev + 1);
+                    window.location.reload(); // 간단한 재시도 방법
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                >
+                  다시 시도
+                </button>
               </div>
             </div>
           ) : position ? (
@@ -198,23 +209,40 @@ export default function App() {
 
         {/* Current Location */}
         <div className="bg-blue-50 rounded-lg p-4">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-3">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="font-medium text-gray-800">현재 위치</span>
             </div>
-            <span className="font-medium text-gray-800">현재 위치</span>
+            {error && (
+              <button
+                onClick={() => {
+                  console.log('🔄 위치 정보 재시도 요청');
+                  window.location.reload();
+                }}
+                className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
+              >
+                재시도
+              </button>
+            )}
           </div>
           <p className="text-blue-600 text-sm">
-            {position ? (
+            {loading ? (
+              <span className="text-gray-500">위치 정보를 가져오는 중...</span>
+            ) : error ? (
+              <span className="text-red-500">{error}</span>
+            ) : position ? (
               isLoadingAddress ? (
                 <span className="text-gray-500">주소 조회 중...</span>
               ) : (
                 address || `${position.latitude.toFixed(4)}, ${position.longitude.toFixed(4)}`
               )
             ) : (
-              '위치 정보 없음'
+              <span className="text-gray-500">위치 정보 없음</span>
             )}
           </p>
         </div>

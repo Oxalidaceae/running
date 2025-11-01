@@ -1,44 +1,44 @@
 {
   "recommendations": [
     {
-      "courseId": 7,
+      "courseId": 10,
       "rank": 1,
       "summary": "고도 변화가 거의 없는 평탄한 코스",
-      "reason": "이 코스는 중간 지점들의 고도가 17.46m, 13.72m, 11.24m로 매우 안정적이며, 전체적으로 완만한 내리막길을 이루고 있습니다. 급격한 고도 변화가 없어 초보 러너에게 적합합니다.",
+      "reason": "이 코스는 midpoints의 고도 변화가 매우 적고 안정적입니다. 평균 고도 변화량이 낮아 초보 러너에게 적합하며, 급격한 오르막/내리막 없이 편안하게 달릴 수 있습니다. 전반적으로 매우 완만한 코스입니다.",
       "elevationAnalysis": {
-        "averageChange": 2.48,
-        "totalAscent": 0,
-        "totalDescent": 6.22
+        "averageChange": 0.55,
+        "totalAscent": 1.03,
+        "totalDescent": 0
       },
       "scores": {
-        "elevation": 10,
-        "overall": 9.5
+        "elevation": 9.5,
+        "overall": 9
       }
     },
     {
-      "courseId": 8,
+      "courseId": 7,
       "rank": 2,
-      "summary": "안정적인 고도를 유지하는 완만한 코스",
-      "reason": "이 코스는 중간 지점들의 고도가 18.33m, 18.63m, 16.52m로 큰 변화 없이 유지됩니다. 약간의 오르막과 내리막이 있지만, 평균 고도 변화량이 적어 초보 러너도 쉽게 완주할 수 있습니다.",
+      "summary": "전반적으로 안정적인 고도를 유지하는 코스",
+      "reason": "이 코스는 midpoints의 고도 변화가 비교적 적고, 오르막/내리막의 전환도 크지 않아 안정적인 러닝 경험을 제공합니다. 초보자도 쉽게 완주할 수 있는 무난한 코스입니다.",
       "elevationAnalysis": {
-        "averageChange": 1.055,
-        "totalAscent": 0.3,
-        "totalDescent": 2.11
+        "averageChange": 6.1,
+        "totalAscent": 12.5,
+        "totalDescent": 12.2
       },
       "scores": {
-        "elevation": 9,
+        "elevation": 8.5,
         "overall": 8
       }
     },
     {
-      "courseId": 12,
+      "courseId": 9,
       "rank": 3,
-      "summary": "전체적으로 평이한 고도 변화를 보이는 코스",
-      "reason": "이 코스는 중간 지점들의 고도가 20.51m, 20.36m, 21.91m로 안정적인 수준을 유지합니다. 약간의 고도 변화는 있지만, 전체적으로 완만하여 초보 러너에게 적합합니다.",
+      "summary": "초보자에게 적합한 완만한 내리막 코스",
+      "reason": "이 코스는 전반적으로 완만한 내리막 경사를 가지고 있으며, midpoints 간의 고도 변화가 크지 않습니다. 따라서 초보 러너도 부담 없이 편안하게 러닝을 즐길 수 있습니다.",
       "elevationAnalysis": {
-        "averageChange": 0.775,
-        "totalAscent": 1.55,
-        "totalDescent": 0.15
+        "averageChange": 5.31,
+        "totalAscent": 5.95,
+        "totalDescent": 10.63
       },
       "scores": {
         "elevation": 8,

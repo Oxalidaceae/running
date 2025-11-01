@@ -94,7 +94,7 @@ async function attemptRecommendation(model: any, courses: any[]) {
 
 추천 이유 작성 지침:
 - 각 코스의 고도 변화 패턴을 구체적으로 언급하세요.
-- 영어 키워드 대신 한국어로 작성하세요.
+- 반드시 한국어로 작성하세요. (midpoints, elevation 등 영어 키워드 대신 한국어로 작성하세요.)
 - 내부적인 정보 (ex: 코스7) 대신에 일반적인 정보(이 코스)로 설명하세요.
 
 **상위 3개 코스만 추천하세요.**
