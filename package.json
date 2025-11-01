@@ -10,6 +10,7 @@
     "dev": "npm run dev --workspace=@running/frontend",
     "dev:frontend": "npm run dev --workspace=@running/frontend",
     "dev:backend": "npm run dev --workspace=@running/backend",
+    "generate-courses": "npm run generate-courses --workspace=@running/backend",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspace=@running/frontend"
   },
