@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Position } from '../types';
+import { saveCourse, isCourseAlreadySaved, removeSavedCourse, type SavedCourse } from '../utils/courseStorage';
+import SavedCoursesMenu from './SavedCoursesMenu';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -30,12 +32,16 @@ interface CourseDetailProps {
   course: Course;
   userPosition: Position;
   onBack: () => void;
+  onSavedCourseSelect?: (course: Course, userPosition: Position) => void;
+  isFromSavedCourse?: boolean; // 저장된 코스에서 온 것인지 구분
 }
 
 const CourseDetail: React.FC<CourseDetailProps> = ({
   course,
   userPosition,
-  onBack
+  onBack,
+  onSavedCourseSelect,
+  isFromSavedCourse = false
 }) => {
   const [addresses, setAddresses] = useState<{
     start: string;
@@ -47,6 +53,9 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     end: ''
   });
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavedCoursesMenuOpen, setIsSavedCoursesMenuOpen] = useState(false);
 
   // 주소를 가져오는 함수
   const fetchAddress = async (lat: number, lng: number): Promise<string> => {
@@ -64,6 +73,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     }
   };
+
+  // 코스 저장 상태 확인
+  useEffect(() => {
+    setIsSaved(isCourseAlreadySaved(course.courseId));
+  }, [course.courseId]);
 
   // 모든 지점의 주소를 가져오기
   useEffect(() => {
@@ -119,6 +133,63 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
     return `https://map.kakao.com/link/by/walk/${fullPath}`;
   };
+
+  // 코스 저장 함수
+  const handleSaveCourse = async () => {
+    if (isSaved || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const courseToSave = {
+        ...course,
+        userPosition
+      };
+      await saveCourse(courseToSave, userPosition);
+      setIsSaved(true);
+      alert('코스가 저장되었습니다!');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '코스 저장에 실패했습니다.';
+      alert(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 저장된 코스 선택 핸들러
+  const handleSavedCourseSelect = (savedCourse: SavedCourse) => {
+    if (onSavedCourseSelect) {
+      // SavedCourse를 Course 타입으로 변환
+      const newCourse: Course = {
+        courseId: savedCourse.courseId,
+        rank: savedCourse.rank,
+        summary: savedCourse.summary,
+        reason: savedCourse.reason,
+        elevationAnalysis: savedCourse.elevationAnalysis,
+        scores: savedCourse.scores,
+        name: savedCourse.name,
+        distance: savedCourse.distance,
+        estimatedTime: savedCourse.estimatedTime,
+        waypoints: savedCourse.waypoints
+      };
+      
+      onSavedCourseSelect(newCourse, savedCourse.userPosition);
+    }
+  };
+
+  // 저장된 코스 삭제 함수
+  const handleDeleteSavedCourse = async () => {
+    if (confirm('이 저장된 코스를 삭제하시겠습니까?')) {
+      try {
+        removeSavedCourse(course.courseId);
+        setIsSaved(false);
+        alert('코스가 삭제되었습니다.');
+        onBack(); // 메인으로 돌아가기
+      } catch (error) {
+        alert('코스 삭제에 실패했습니다.');
+      }
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -130,7 +201,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             </svg>
           </button>
           <h1 className="text-xl font-semibold text-gray-800">{course.name}</h1>
-          <div className="w-10"></div>
+          <button
+            onClick={() => setIsSavedCoursesMenuOpen(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -278,18 +356,73 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
           >
             <span>카카오맵에서 크게 보기</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </button>
+
+          {/* 저장된 코스에서 온 경우와 새로 생성된 코스에서 온 경우를 구분 */}
+          {isFromSavedCourse ? (
+            // 저장된 코스에서 온 경우: 저장 삭제 버튼
+            <button
+              onClick={handleDeleteSavedCourse}
+              className="w-full bg-red-500 text-white font-semibold py-4 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <span>저장 삭제</span>
+            </button>
+          ) : (
+            // 새로 생성된 코스에서 온 경우: 저장하기 버튼
+            <button
+              onClick={handleSaveCourse}
+              disabled={isSaved || isSaving}
+              className={`w-full font-semibold py-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+                isSaved 
+                  ? 'bg-green-500 text-white cursor-default' 
+                  : isSaving 
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-purple-500 text-white hover:bg-purple-600'
+              }`}
+            >
+              {isSaving ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>저장 중...</span>
+                </>
+              ) : isSaved ? (
+                <>
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>저장 완료</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>코스 저장하기</span>
+                </>
+              )}
+            </button>
+          )}
 
           <button
             onClick={onBack}
             className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
           >
-            다른 코스 선택
+            {isFromSavedCourse ? '메인으로 돌아가기' : '다른 코스 선택'}
           </button>
         </div>
       </div>
+
+      {/* 저장된 코스 사이드바 메뉴 */}
+      <SavedCoursesMenu
+        isOpen={isSavedCoursesMenuOpen}
+        onClose={() => setIsSavedCoursesMenuOpen(false)}
+        onCourseSelect={handleSavedCourseSelect}
+      />
     </div>
   );
 };
