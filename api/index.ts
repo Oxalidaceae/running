@@ -42,18 +42,18 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 라우트
-app.use('/api', geolocationRouter);
-app.use('/api', elevationRouter);
-app.use('/api/courses', coursesRouter);
+// 라우트 - 경로 중복 제거
+app.use(geolocationRouter);  // /api 제거 - 이미 geolocationRouter 내부에서 /geolocation, /reverse-geocode 정의
+app.use(elevationRouter);     // /api 제거
+app.use('/courses', coursesRouter);  // /api/courses -> /courses로 변경
 
 // 헬스 체크
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // 환경 변수 디버깅 엔드포인트 (프로덕션에서는 제거 권장)
-app.get('/api/debug/env', (req, res) => {
+app.get('/debug/env', (req, res) => {
   const envVars = {
     NODE_ENV: process.env.NODE_ENV,
     KAKAO_REST_API_KEY: process.env.KAKAO_REST_API_KEY ? `${process.env.KAKAO_REST_API_KEY.substring(0, 8)}...` : 'undefined',
