@@ -8,8 +8,18 @@
       "runtime": "@vercel/node@3.2.29"
     }
   },
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index.ts" }
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ],
   "env": {
     "NODE_ENV": "production"
