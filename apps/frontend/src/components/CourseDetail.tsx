@@ -167,7 +167,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   // 저장된 코스 삭제 함수
   const handleDeleteSavedCourse = async () => {
-    if (confirm('이 저장된 코스를 삭제하시겠습니까?')) {
+    if (confirm(`"${course.name}" 코스를 삭제하시겠습니까?`)) {
       try {
         // 저장된 코스들 중에서 현재 코스와 일치하는 것을 찾아 해시로 삭제
         const savedCourses = getSavedCourses();

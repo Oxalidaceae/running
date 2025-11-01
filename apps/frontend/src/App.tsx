@@ -166,12 +166,7 @@ export default function App() {
     setCurrentScreen('course-detail');
   }
 
-  const handleSavedCourseSelectFromDetail = (course: Course, userPosition: { latitude: number; longitude: number }) => {
-    setSelectedCourse(course);
-    setSelectedCourseUserPosition(userPosition);
-    setIsFromSavedCourse(true); // 저장된 코스에서 선택됨
-    // 이미 course-detail 화면에 있으므로 화면 변경 없음
-  }
+
 
   // 코스 상세 화면 렌더링
   if (currentScreen === 'course-detail' && selectedCourse && selectedCourseUserPosition) {
@@ -180,7 +175,6 @@ export default function App() {
         course={selectedCourse}
         userPosition={selectedCourseUserPosition}
         onBack={handleBackToCourseList}
-        onSavedCourseSelect={handleSavedCourseSelectFromDetail}
         isFromSavedCourse={isFromSavedCourse}
       />
     );
@@ -195,7 +189,6 @@ export default function App() {
         courses={courses} // 미리 가져온 코스 데이터 전달
         onBack={handleBackToMain}
         onCourseSelect={handleCourseSelect}
-        onSavedCourseSelect={handleSavedCourseSelectFromDetail}
       />
     );
   }
