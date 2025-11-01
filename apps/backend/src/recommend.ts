@@ -6,7 +6,7 @@ import { recommendCourse } from "./llm.js";
 async function main() {
   try {
     // output-with-elevation.json 읽기
-    const dataPath = join(process.cwd(), "output-with-elevation.json");
+    const dataPath = join(process.cwd(), "output-complete.json");
     const data = await readFile(dataPath, "utf-8");
     const parsed = JSON.parse(data);
 

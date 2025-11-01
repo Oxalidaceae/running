@@ -9,6 +9,43 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
     { model: "gemini-2.5-flash" },
   );
 
+  // 모델 응답에서 첫 번째 JSON 오브젝트만 안전하게 추출하는 유틸
+  function extractFirstJsonObject(text: string): string | null {
+    // 1) 코드 블록 안의 JSON 우선 추출
+    const codeBlockMatch = text.match(/```(?:json)?\n([\s\S]*?)\n```/i);
+    if (codeBlockMatch && codeBlockMatch[1]) {
+      return codeBlockMatch[1].trim();
+    }
+    // 2) 중괄호 균형을 이용해 첫 JSON 오브젝트 추출
+    const start = text.indexOf("{");
+    if (start === -1) return null;
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (inString) {
+        if (escape) {
+          escape = false;
+        } else if (ch === "\\") {
+          escape = true;
+        } else if (ch === '"') {
+          inString = false;
+        }
+      } else {
+        if (ch === '"') inString = true;
+        else if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (depth === 0) {
+            return text.slice(start, i + 1);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   const prompt = `
 당신은 러닝 코스 추천 전문가입니다.
 다음은 12개의 러닝 코스 데이터입니다.
@@ -29,23 +66,23 @@ export async function recommendCourse(courses: any[], outputPath?: string) {
 
 **상위 3개 코스만 추천하세요.**
 
-응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만):
+응답은 반드시 다음 JSON 형식으로만 작성하세요 (마크다운 코드 블록 없이 순수 JSON만, 첫 글자는 {, 마지막 글자는 } 이어야 함. 숫자 필드는 숫자 타입으로, 단위를 붙이지 마세요):
 {
   "recommendations": [
     {
-      "courseId": 코스_ID(숫자),
-      "rank": 순위(1-3),
+      "courseId": 1,
+      "rank": 1,
       "summary": "코스 한 줄 요약",
       "reason": "추천 이유 (midpoints 고도 변화 패턴 구체적으로)",
       "elevationAnalysis": {
-        "averageChange": 평균_고도_변화량_숫자(m),
-        "totalAscent": 총_상승량_숫자(m),
-        "totalDescent": 총_하강량_숫자(m),
-        "changeFrequency": "고도_변화_빈도_설명"
+        "averageChange": 5.0,
+        "totalAscent": 50.0,
+        "totalDescent": 45.0,
+        "changeFrequency": "낮음"
       },
       "scores": {
-        "elevation": 고도_점수(1-10),
-        "overall": 종합_점수(1-10)
+        "elevation": 9,
+        "overall": 8.5
       }
     }
   ]
@@ -57,19 +94,23 @@ ${JSON.stringify(courses, null, 2)}
 
   const result = await model.generateContent(prompt);
   const text = result.response.text();
-  
-  // JSON 추출 (마크다운 코드 블록 제거)
-  let jsonText = text.trim();
-  if (jsonText.startsWith("```")) {
-    jsonText = jsonText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+
+  const extracted = extractFirstJsonObject(text.trim());
+  if (!extracted) {
+    throw new Error("JSON 형식의 응답을 찾지 못했습니다.");
   }
-  
-  const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error("JSON 형식의 응답을 받지 못했습니다.");
+
+  let recommendation: any;
+  try {
+    recommendation = JSON.parse(extracted);
+  } catch (e) {
+    throw new Error(`모델 응답 JSON 파싱 실패: ${(e as Error).message}`);
   }
-  
-  const recommendation = JSON.parse(jsonMatch[0]);
+
+  // 상위 3개만 보장
+  if (Array.isArray(recommendation?.recommendations)) {
+    recommendation.recommendations = recommendation.recommendations.slice(0, 3);
+  }
   
   // JSON 파일로 저장
   if (outputPath) {
