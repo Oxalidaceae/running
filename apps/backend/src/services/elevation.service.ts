@@ -2,7 +2,10 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 
 // 백엔드 루트의 .env.local 파일 로드
-config({ path: resolve(process.cwd(), '.env.local') });
+if(process.env.NODE_ENV !== 'production') {
+  config({ path: resolve(process.cwd(), '.env.local') });
+}
+
 // 백엔드 루트의 .env.local 파일 로드
 // config({ path: resolve(__dirname, '../../.env.local') });
 
