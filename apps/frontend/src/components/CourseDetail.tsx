@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Position } from '../types';
-import { saveCourse, isCourseAlreadySaved, removeSavedCourse, removeSavedCourseByHash, getSavedCourses } from '../utils/courseStorage';
+import { saveCourse, removeSavedCourse, removeSavedCourseByHash, getSavedCourses } from '../utils/courseStorage';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -40,6 +40,71 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   onBack,
   isFromSavedCourse = false
 }) => {
+  // 저장 관련 상태
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [customCourseName, setCustomCourseName] = useState('');
+  
+  // 주소 관련 상태
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [addresses, setAddresses] = useState({
+    start: `${userPosition.latitude.toFixed(4)}, ${userPosition.longitude.toFixed(4)}`,
+    waypoint: course.waypoints.length > 0 
+      ? `${course.waypoints[0].latitude.toFixed(4)}, ${course.waypoints[0].longitude.toFixed(4)}`
+      : '',
+    end: `${userPosition.latitude.toFixed(4)}, ${userPosition.longitude.toFixed(4)}`
+  });
+
+  // 컴포넌트 마운트 시 주소 조회
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      setIsLoadingAddresses(true);
+      try {
+        // 출발지 주소 조회
+        const startResponse = await fetch(
+          `http://localhost:3000/api/reverse-geocode?lat=${userPosition.latitude}&lng=${userPosition.longitude}`
+        );
+        
+        let startAddress = `${userPosition.latitude.toFixed(4)}, ${userPosition.longitude.toFixed(4)}`;
+        if (startResponse.ok) {
+          const startData = await startResponse.json();
+          if (startData.success && startData.address) {
+            startAddress = startData.address.road_address?.address_name || startData.address.address_name;
+          }
+        }
+
+        // 경유지 주소 조회
+        let waypointAddress = '';
+        if (course.waypoints.length > 0) {
+          const waypointResponse = await fetch(
+            `http://localhost:3000/api/reverse-geocode?lat=${course.waypoints[0].latitude}&lng=${course.waypoints[0].longitude}`
+          );
+          
+          waypointAddress = `${course.waypoints[0].latitude.toFixed(4)}, ${course.waypoints[0].longitude.toFixed(4)}`;
+          if (waypointResponse.ok) {
+            const waypointData = await waypointResponse.json();
+            if (waypointData.success && waypointData.address) {
+              waypointAddress = waypointData.address.road_address?.address_name || waypointData.address.address_name;
+            }
+          }
+        }
+
+        setAddresses({
+          start: startAddress,
+          waypoint: waypointAddress,
+          end: startAddress // 도착점은 출발점과 동일
+        });
+      } catch (error) {
+        console.error('주소 조회 오류:', error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, [userPosition, course.waypoints]);
+
   // Tmap HTML URL 생성
   const generateTmapUrl = () => {
     if (course.waypoints.length === 0) return '';
@@ -50,6 +115,29 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     });
     
     return `/src/components/tmap.html?${params.toString()}`;
+  };
+
+  // 카카오맵 경로 링크 생성 함수
+  const generateKakaoMapUrl = () => {
+    // 출발점 (현재 위치) - 주소에서 간단한 이름 추출
+    const startName = addresses.start || '출발점';
+    const start = `${encodeURIComponent(startName)},${userPosition.latitude},${userPosition.longitude}`;
+
+    // 경유지 (1개)
+    let waypoint = '';
+    if (course.waypoints.length > 0) {
+      const waypointName = addresses.waypoint || '경유지';
+      waypoint = `${encodeURIComponent(waypointName)},${course.waypoints[0].latitude},${course.waypoints[0].longitude}`;
+    }
+
+    // 도착점 (출발점으로 복귀 - 원형 코스)
+    const endName = addresses.end || '도착점';
+    const end = `${encodeURIComponent(endName)},${userPosition.latitude},${userPosition.longitude}`;
+
+    // 전체 경로 조합
+    const fullPath = waypoint ? `${start}/${waypoint}/${end}` : `${start}/${end}`;
+
+    return `https://map.kakao.com/link/by/walk/${fullPath}`;
   };
 
   // 저장 모달 열기
@@ -330,7 +418,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
           <button
             onClick={onBack}
-            className="w-full bg-blue-500 text-white font-semibold py-4 rounded-lg hover:bg-blue-600 transition-colors"
+            className="w-full bg-gray-200 text-gray-700 font-semibold py-4 rounded-lg hover:bg-gray-300 transition-colors"
           >
             {isFromSavedCourse ? '메인으로 돌아가기' : '다른 코스 선택'}
           </button>
