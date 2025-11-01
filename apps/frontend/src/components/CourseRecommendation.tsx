@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import type { Position } from '../types';
+import SavedCoursesMenu from './SavedCoursesMenu';
+import type { SavedCourse } from '../utils/courseStorage';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -32,6 +34,7 @@ interface CourseRecommendationProps {
   courses: Course[]; // 미리 가져온 코스 데이터
   onBack: () => void;
   onCourseSelect: (course: Course) => void;
+  onSavedCourseSelect?: (course: Course, userPosition: Position) => void;
 }
 
 const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
@@ -39,10 +42,12 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
   position,
   courses, // props로 받은 코스 데이터 사용
   onBack,
-  onCourseSelect
+  onCourseSelect,
+  onSavedCourseSelect
 }) => {
   const [address, setAddress] = useState<string>('');
   const [isLoadingAddress, setIsLoadingAddress] = useState(true);
+  const [isSavedCoursesMenuOpen, setIsSavedCoursesMenuOpen] = useState(false);
 
   // 위치를 주소로 변환하는 함수
   const fetchAddress = useCallback(async () => {
@@ -76,6 +81,27 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
     fetchAddress();
   }, [fetchAddress]);
 
+  // 저장된 코스 선택 핸들러
+  const handleSavedCourseSelect = (savedCourse: SavedCourse) => {
+    if (onSavedCourseSelect) {
+      // SavedCourse를 Course 타입으로 변환
+      const course: Course = {
+        courseId: savedCourse.courseId,
+        rank: savedCourse.rank,
+        summary: savedCourse.summary,
+        reason: savedCourse.reason,
+        elevationAnalysis: savedCourse.elevationAnalysis,
+        scores: savedCourse.scores,
+        name: savedCourse.name,
+        distance: savedCourse.distance,
+        estimatedTime: savedCourse.estimatedTime,
+        waypoints: savedCourse.waypoints
+      };
+      
+      onSavedCourseSelect(course, savedCourse.userPosition);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -87,7 +113,14 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
             </svg>
           </button>
           <h1 className="text-xl font-semibold text-gray-800">코스 추천</h1>
-          <div className="w-10"></div>
+          <button
+            onClick={() => setIsSavedCoursesMenuOpen(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -170,6 +203,13 @@ const CourseRecommendation: React.FC<CourseRecommendationProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 저장된 코스 사이드바 메뉴 */}
+      <SavedCoursesMenu
+        isOpen={isSavedCoursesMenuOpen}
+        onClose={() => setIsSavedCoursesMenuOpen(false)}
+        onCourseSelect={handleSavedCourseSelect}
+      />
     </div>
   );
 };

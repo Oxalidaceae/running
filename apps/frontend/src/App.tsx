@@ -4,6 +4,8 @@ import { useGeolocation } from './hooks/useGeolocation'
 import MapComponent from './components/MapComponent'
 import CourseRecommendation from './components/CourseRecommendation'
 import CourseDetail from './components/CourseDetail'
+import SavedCoursesMenu from './components/SavedCoursesMenu'
+import type { SavedCourse } from './utils/courseStorage'
 
 type AppScreen = 'main' | 'course-recommendation' | 'course-detail';
 
@@ -38,10 +40,12 @@ export default function App() {
   const [isGeneratingCourse, setIsGeneratingCourse] = useState(false)
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('main')
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [selectedCourseUserPosition, setSelectedCourseUserPosition] = useState<{ latitude: number; longitude: number } | null>(null)
+  const [isFromSavedCourse, setIsFromSavedCourse] = useState<boolean>(false)
   const [courses, setCourses] = useState<Course[]>([]) // 코스 데이터를 App에서 관리
   const [address, setAddress] = useState<string>('')
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
-  const [locationRetryKey, setLocationRetryKey] = useState(0) // 위치 재시도를 위한 키
+  const [isSavedCoursesMenuOpen, setIsSavedCoursesMenuOpen] = useState(false)
 
   // 위치를 주소로 변환하는 함수
   const fetchAddress = async (lat: number, lng: number) => {
@@ -125,20 +129,59 @@ export default function App() {
 
   const handleCourseSelect = (course: Course) => {
     setSelectedCourse(course)
+    setSelectedCourseUserPosition(position) // 현재 위치 사용
+    setIsFromSavedCourse(false) // 새로 생성된 코스
     setCurrentScreen('course-detail')
   }
 
   const handleBackToCourseList = () => {
-    setCurrentScreen('course-recommendation')
+    if (isFromSavedCourse) {
+      // 저장된 코스에서 온 경우 메인으로 돌아가기
+      setCurrentScreen('main')
+      setCourses([]) // 코스 데이터 초기화
+    } else {
+      // 새로 생성된 코스에서 온 경우 코스 목록으로 돌아가기
+      setCurrentScreen('course-recommendation')
+    }
+  }
+
+  const handleSavedCourseSelect = (savedCourse: SavedCourse) => {
+    // SavedCourse를 Course 타입으로 변환
+    const course: Course = {
+      courseId: savedCourse.courseId,
+      rank: savedCourse.rank,
+      summary: savedCourse.summary,
+      reason: savedCourse.reason,
+      elevationAnalysis: savedCourse.elevationAnalysis,
+      scores: savedCourse.scores,
+      name: savedCourse.name,
+      distance: savedCourse.distance,
+      estimatedTime: savedCourse.estimatedTime,
+      waypoints: savedCourse.waypoints
+    };
+    
+    setSelectedCourse(course);
+    setSelectedCourseUserPosition(savedCourse.userPosition); // 저장된 사용자 위치 사용
+    setIsFromSavedCourse(true); // 저장된 코스에서 온 것임을 표시
+    setCurrentScreen('course-detail');
+  }
+
+  const handleSavedCourseSelectFromDetail = (course: Course, userPosition: { latitude: number; longitude: number }) => {
+    setSelectedCourse(course);
+    setSelectedCourseUserPosition(userPosition);
+    setIsFromSavedCourse(true); // 저장된 코스에서 선택됨
+    // 이미 course-detail 화면에 있으므로 화면 변경 없음
   }
 
   // 코스 상세 화면 렌더링
-  if (currentScreen === 'course-detail' && position && selectedCourse) {
+  if (currentScreen === 'course-detail' && selectedCourse && selectedCourseUserPosition) {
     return (
       <CourseDetail
         course={selectedCourse}
-        userPosition={position}
+        userPosition={selectedCourseUserPosition}
         onBack={handleBackToCourseList}
+        onSavedCourseSelect={handleSavedCourseSelectFromDetail}
+        isFromSavedCourse={isFromSavedCourse}
       />
     );
   }
@@ -152,6 +195,7 @@ export default function App() {
         courses={courses} // 미리 가져온 코스 데이터 전달
         onBack={handleBackToMain}
         onCourseSelect={handleCourseSelect}
+        onSavedCourseSelect={handleSavedCourseSelectFromDetail}
       />
     );
   }
@@ -160,11 +204,25 @@ export default function App() {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="flex items-center justify-center px-4 py-4">
+        <div className="flex items-center justify-between px-4 py-4">
+          {/* 햄버거 메뉴 버튼 */}
+          <button
+            onClick={() => setIsSavedCoursesMenuOpen(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
+          {/* 앱 제목 */}
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-semibold text-gray-800">오어달</h1>
             <span className="text-2xl">🏃‍♂️</span>
           </div>
+          
+          {/* 빈 공간 (레이아웃 균형용) */}
+          <div className="w-10"></div>
         </div>
       </header>
 
@@ -186,7 +244,6 @@ export default function App() {
                 <button
                   onClick={() => {
                     console.log('🔄 위치 정보 재시도 요청');
-                    setLocationRetryKey(prev => prev + 1);
                     window.location.reload(); // 간단한 재시도 방법
                   }}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
@@ -280,6 +337,13 @@ export default function App() {
           )}
         </button>
       </div>
+
+      {/* 저장된 코스 사이드바 메뉴 */}
+      <SavedCoursesMenu
+        isOpen={isSavedCoursesMenuOpen}
+        onClose={() => setIsSavedCoursesMenuOpen(false)}
+        onCourseSelect={handleSavedCourseSelect}
+      />
     </div>
   )
 }

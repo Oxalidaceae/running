@@ -1,14 +1,14 @@
 {
   "recommendations": [
     {
-      "courseId": 10,
+      "courseId": 8,
       "rank": 1,
-      "summary": "고도 변화가 거의 없는 평탄한 코스",
-      "reason": "이 코스는 midpoints의 고도 변화가 매우 적고 안정적입니다. 평균 고도 변화량이 낮아 초보 러너에게 적합하며, 급격한 오르막/내리막 없이 편안하게 달릴 수 있습니다. 전반적으로 매우 완만한 코스입니다.",
+      "summary": "전반적으로 고도 변화가 적어 초보자에게 적합한 평탄한 코스",
+      "reason": "이 코스는 중간 지점들의 고도 변화가 매우 적고, 전체적으로 완만한 경사를 유지합니다. 따라서 급격한 오르막이나 내리막 없이 비교적 일정한 페이스로 달릴 수 있어 초보 러너에게 적합합니다. 중간 지점들의 고도 값이 안정적이며, 고도 변화의 빈도도 낮아 편안한 러닝 경험을 제공합니다.",
       "elevationAnalysis": {
-        "averageChange": 0.55,
-        "totalAscent": 1.03,
-        "totalDescent": 0
+        "averageChange": 1.29,
+        "totalAscent": 3.86,
+        "totalDescent": 5.51
       },
       "scores": {
         "elevation": 9.5,
@@ -16,33 +16,33 @@
       }
     },
     {
-      "courseId": 7,
+      "courseId": 11,
       "rank": 2,
-      "summary": "전반적으로 안정적인 고도를 유지하는 코스",
-      "reason": "이 코스는 midpoints의 고도 변화가 비교적 적고, 오르막/내리막의 전환도 크지 않아 안정적인 러닝 경험을 제공합니다. 초보자도 쉽게 완주할 수 있는 무난한 코스입니다.",
+      "summary": "고도 변화가 적고 안정적인, 초보 러너에게 좋은 선택",
+      "reason": "이 코스는 중간 지점 간의 고도 변화가 크지 않아 비교적 평탄한 코스입니다. 고도 변화의 빈도도 낮고, 전반적으로 안정적인 고도 값을 유지하므로 초보 러너도 부담 없이 완주할 수 있습니다. 중간 지점들의 고도 변화가 적어 에너지 소모를 최소화하며 꾸준히 달릴 수 있습니다.",
       "elevationAnalysis": {
-        "averageChange": 6.1,
-        "totalAscent": 12.5,
-        "totalDescent": 12.2
+        "averageChange": 0.71,
+        "totalAscent": 7.12,
+        "totalDescent": 0
       },
       "scores": {
-        "elevation": 8.5,
-        "overall": 8
+        "elevation": 9,
+        "overall": 8.8
       }
     },
     {
-      "courseId": 9,
+      "courseId": 7,
       "rank": 3,
-      "summary": "초보자에게 적합한 완만한 내리막 코스",
-      "reason": "이 코스는 전반적으로 완만한 내리막 경사를 가지고 있으며, midpoints 간의 고도 변화가 크지 않습니다. 따라서 초보 러너도 부담 없이 편안하게 러닝을 즐길 수 있습니다.",
+      "summary": "부드러운 고도 변화로 편안한 러닝을 즐길 수 있는 코스",
+      "reason": "이 코스는 중간 지점들의 고도 변화가 비교적 완만하며, 급격한 오르막 내리막이 적습니다. 따라서 편안하게 러닝을 즐기기에 적합하며, 초보 러너도 무리 없이 완주할 수 있습니다. 고도 변화의 빈도가 낮아 페이스 조절이 용이하고, 안정적인 러닝 경험을 제공합니다.",
       "elevationAnalysis": {
-        "averageChange": 5.31,
-        "totalAscent": 5.95,
-        "totalDescent": 10.63
+        "averageChange": 9.16,
+        "totalAscent": 14.79,
+        "totalDescent": 27.62
       },
       "scores": {
-        "elevation": 8,
-        "overall": 7.5
+        "elevation": 8.5,
+        "overall": 8.2
       }
     }
   ]
