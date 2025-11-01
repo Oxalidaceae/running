@@ -131,11 +131,6 @@ export default function App() {
     setCurrentScreen('course-recommendation')
   }
 
-  const handleStartRunning = () => {
-    // TODO: 러닝 시작 화면으로 이동
-    alert('러닝을 시작합니다!')
-  }
-
   // 코스 상세 화면 렌더링
   if (currentScreen === 'course-detail' && position && selectedCourse) {
     return (
@@ -143,7 +138,6 @@ export default function App() {
         course={selectedCourse}
         userPosition={position}
         onBack={handleBackToCourseList}
-        onStartRunning={handleStartRunning}
       />
     );
   }
