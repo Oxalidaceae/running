@@ -226,6 +226,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 src={getTmapUrl()}
                 className="w-full h-full border-0"
                 title="Tmap 경로"
+                onLoad={() => console.log('✅ Tmap iframe 로드 완료')}
+                onError={(e) => console.error('❌ Tmap iframe 로드 실패:', e)}
               />
             ) : (
               <div className="h-full flex items-center justify-center bg-gray-50">

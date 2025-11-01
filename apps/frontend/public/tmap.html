@@ -6,24 +6,12 @@
   <!-- Tmap SDK - .env.local의 VITE_TMAP_API_KEY와 동일한 키 사용 -->
   <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=eeVNdffaIL4ehi9H8tRja3ehIsqyAMBq6wnsNAHX"></script>
   <style>
-    body { margin:0; font-family: system-ui, sans-serif; }
-    #map { width:100%; height:520px; }
-    .panel { padding:10px 12px; }
-    details>summary { cursor:pointer; }
-    pre { background:#f7f7f7; padding:10px; overflow:auto; }
-    .err { color:#b00020; white-space:pre-wrap; }
+    html, body { margin:0; padding:0; height:100%; font-family: system-ui, sans-serif; overflow:hidden; }
+    #map { width:100%; height:100vh; }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <div class="panel">
-    <div id="summary">요청 준비 중…</div>
-    <div id="errors" class="err"></div>
-    <details style="margin-top:8px">
-      <summary>JSON 응답 보기</summary>
-      <pre id="json"></pre>
-    </details>
-  </div>
 
   <script>
     async function main() {
@@ -32,17 +20,15 @@
       const appKey = "eeVNdffaIL4ehi9H8tRja3ehIsqyAMBq6wnsNAHX"; // .env.local의 VITE_TMAP_API_KEY와 동일
 
       // URL 파라미터에서 좌표 가져오기
-      // 예: ?apiKey=YOUR_KEY&origin=37.5616,126.9970&waypoint=37.5622,126.9956
-      
       // origin 파라미터 파싱
       const originParam = urlParams.get('origin');
       if (!originParam) {
-        document.getElementById("errors").textContent = "URL에 origin 파라미터가 필요합니다. 예: ?origin=37.5616,126.9970&waypoint=37.5622,126.9956";
+        console.error("URL에 origin 파라미터가 필요합니다.");
         return;
       }
       const [originLat, originLng] = originParam.split(',').map(Number);
       if (isNaN(originLat) || isNaN(originLng)) {
-        document.getElementById("errors").textContent = "origin 좌표 형식이 올바르지 않습니다. 예: origin=37.5616,126.9970";
+        console.error("origin 좌표 형식이 올바르지 않습니다.");
         return;
       }
       const origin = { lat: originLat, lng: originLng };
@@ -50,12 +36,12 @@
       // waypoint 파라미터 파싱
       const waypointParam = urlParams.get('waypoint');
       if (!waypointParam) {
-        document.getElementById("errors").textContent = "URL에 waypoint 파라미터가 필요합니다. 예: ?origin=37.5616,126.9970&waypoint=37.5622,126.9956";
+        console.error("URL에 waypoint 파라미터가 필요합니다.");
         return;
       }
       const [waypointLat, waypointLng] = waypointParam.split(',').map(Number);
       if (isNaN(waypointLat) || isNaN(waypointLng)) {
-        document.getElementById("errors").textContent = "waypoint 좌표 형식이 올바르지 않습니다. 예: waypoint=37.5622,126.9956";
+        console.error("waypoint 좌표 형식이 올바르지 않습니다.");
         return;
       }
       const waypoint = { lat: waypointLat, lng: waypointLng };
@@ -63,8 +49,11 @@
       // 지도 생성
       const map = new Tmapv2.Map("map", {
         center: new Tmapv2.LatLng(origin.lat, origin.lng),
-        width: "100%", height: "520px",
-        zoom: 17, zoomControl: true, scrollwheel: true
+        width: "100%", 
+        height: "100vh",
+        zoom: 15, 
+        zoomControl: true, 
+        scrollwheel: true
       });
 
       // 마커 (크고 눈에 띄게 수정)
@@ -107,13 +96,9 @@
         endName:   "도착지",
       });
 
-      const $summary = document.getElementById("summary");
-      const $json = document.getElementById("json");
-      const $errors = document.getElementById("errors");
-
-      // 요청 함수들
-      const callForm = () =>
-        fetch(url, {
+      let res, data;
+      try {
+        res = await fetch(url, {
           method: "POST",
           mode: "cors",
           headers: new Headers({
@@ -124,70 +109,42 @@
           body: formBody.toString(),
         });
 
-      const callJson = () =>
-        fetch("https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1", {
-          method: "POST",
-          mode: "cors",
-          headers: new Headers({
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "appKey": appKey,
-          }),
-          body: JSON.stringify({
-            startX: origin.lng, startY: origin.lat,
-            endX: origin.lng,   endY: origin.lat,
-            passList,
-            reqCoordType: "WGS84GEO",
-            resCoordType: "EPSG3857",
-            startName: "출발지",
-            endName:   "도착지",
-          }),
-        });
-
-      let res, data;
-      try {
-        $summary.textContent = "경로 요청 중…";
-        res = await callForm();
-
         // form 실패 시 JSON 바디로 재시도
         if (!res.ok) {
-          const t = await res.text().catch(() => "");
-          console.warn("x-www-form-urlencoded 실패, JSON으로 재시도:", t);
-          res = await callJson();
+          console.warn("x-www-form-urlencoded 실패, JSON으로 재시도");
+          res = await fetch("https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1", {
+            method: "POST",
+            mode: "cors",
+            headers: new Headers({
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "appKey": appKey,
+            }),
+            body: JSON.stringify({
+              startX: origin.lng, startY: origin.lat,
+              endX: origin.lng,   endY: origin.lat,
+              passList,
+              reqCoordType: "WGS84GEO",
+              resCoordType: "EPSG3857",
+              startName: "출발지",
+              endName:   "도착지",
+            }),
+          });
         }
         if (!res.ok) {
-          const t = await res.text().catch(() => "");
-          throw new Error(`HTTP ${res.status} ${res.statusText}\n${t}`);
+          const errorText = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status}: ${errorText}`);
         }
         data = await res.json();
       } catch (e) {
         console.error("Tmap API error:", e);
-        $errors.textContent =
-          "요청 실패. 확인하세요:\n" +
-          "• AppKey가 정확하고, 보행자 경로 상품이 활성화되어 있는지\n" +
-          "• 앱 설정이 WEB이며, 허용 도메인에 현재 도메인/localhost가 등록됐는지\n" +
-          "• 개발자도구(Network) 응답 본문 에러 메시지\n\n" +
-          (e && e.message ? e.message : e);
-        $summary.textContent = "경로 요청 실패";
         return;
       }
-
-      // JSON 출력
-      $json.textContent = JSON.stringify(data, null, 2);
 
       const features = Array.isArray(data?.features) ? data.features : [];
       if (!features.length) {
-        $summary.textContent = "경로 없음";
+        console.warn("경로 데이터 없음");
         return;
-      }
-
-      // 총거리/시간
-      const totalDistance = features[0]?.properties?.totalDistance; // m
-      const totalTime = features[0]?.properties?.totalTime;         // s
-      if (typeof totalDistance === "number" && typeof totalTime === "number") {
-        $summary.textContent = `총 거리: ${(totalDistance/1000).toFixed(1)} km, 총 시간: ${Math.round(totalTime/60)} 분`;
-      } else {
-        $summary.textContent = "";
       }
 
       // 라인 그리기 (EPSG3857 → WGS84 변환)
@@ -212,13 +169,10 @@
     // SDK 로드 확인 후 실행
     window.addEventListener("load", () => {
       if (!window.Tmapv2) {
-        document.getElementById("errors").textContent = "Tmap JS SDK가 로드되지 않았습니다. 네트워크를 확인하세요.";
+        console.error("Tmap JS SDK가 로드되지 않았습니다.");
         return;
       }
-      main().catch(err => {
-        console.error(err);
-        document.getElementById("errors").textContent = String(err);
-      });
+      main().catch(err => console.error("Tmap 초기화 오류:", err));
     });
   </script>
 </body>
