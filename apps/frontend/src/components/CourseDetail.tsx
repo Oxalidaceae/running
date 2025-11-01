@@ -106,7 +106,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   }, [userPosition, course.waypoints]);
 
   // Tmap HTML URL 생성
-  const generateTmapUrl = () => {
+  const getTmapUrl = () => {
     if (course.waypoints.length === 0) return '';
     
     const params = new URLSearchParams({
@@ -114,7 +114,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       waypoint: `${course.waypoints[0].latitude},${course.waypoints[0].longitude}`,
     });
     
-    return `/src/components/tmap.html?${params.toString()}`;
+    return `/tmap.html?${params.toString()}`;
   };
 
   // 카카오맵 경로 링크 생성 함수
@@ -223,7 +223,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
           <div className="relative h-full">
             {course.waypoints.length > 0 ? (
               <iframe
-                src={generateTmapUrl()}
+                src={getTmapUrl()}
                 className="w-full h-full border-0"
                 title="Tmap 경로"
               />
