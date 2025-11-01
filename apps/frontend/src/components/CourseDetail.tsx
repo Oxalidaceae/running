@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Position } from '../types';
 import { saveCourse, removeSavedCourse, removeSavedCourseByHash, getSavedCourses } from '../utils/courseStorage';
+import { API_BASE_URL } from '../constants';
 
 interface ElevationAnalysis {
   averageChange: number;
@@ -63,7 +64,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       try {
         // 출발지 주소 조회
         const startResponse = await fetch(
-          `http://localhost:3000/api/reverse-geocode?lat=${userPosition.latitude}&lng=${userPosition.longitude}`
+          `${API_BASE_URL}/api/reverse-geocode?lat=${userPosition.latitude}&lng=${userPosition.longitude}`
         );
         
         let startAddress = `${userPosition.latitude.toFixed(4)}, ${userPosition.longitude.toFixed(4)}`;
@@ -78,7 +79,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         let waypointAddress = '';
         if (course.waypoints.length > 0) {
           const waypointResponse = await fetch(
-            `http://localhost:3000/api/reverse-geocode?lat=${course.waypoints[0].latitude}&lng=${course.waypoints[0].longitude}`
+            `${API_BASE_URL}/api/reverse-geocode?lat=${course.waypoints[0].latitude}&lng=${course.waypoints[0].longitude}`
           );
           
           waypointAddress = `${course.waypoints[0].latitude.toFixed(4)}, ${course.waypoints[0].longitude.toFixed(4)}`;
