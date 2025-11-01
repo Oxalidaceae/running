@@ -75,6 +75,8 @@ export const useKakaoMap = (options: KakaoMapOptions) => {
   const markerRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 5;
 
   useEffect(() => {
     if (!options.center) return;
@@ -120,14 +122,39 @@ export const useKakaoMap = (options: KakaoMapOptions) => {
           infoWindow.open(map, marker);
         });
 
+        // 성공 시 재시도 카운터 초기화
+        setRetryCount(0);
+
       } catch (err) {
         console.error('카카오맵 초기화 오류:', err);
-        setError(err instanceof Error ? err.message : '지도 로드 중 오류가 발생했습니다');
+        const errorMessage = err instanceof Error ? err.message : '지도 로드 중 오류가 발생했습니다';
+        
+        // 자동 재시도 로직
+        if (retryCount < maxRetries) {
+          const nextRetryCount = retryCount + 1;
+          console.log(`카카오맵 자동 재시도 ${nextRetryCount}/${maxRetries}...`);
+          setRetryCount(nextRetryCount);
+          
+          // 2초 후 재시도
+          setTimeout(() => {
+            initializeMap();
+          }, 2000);
+        } else {
+          // 최대 재시도 횟수 초과 시 에러 표시
+          console.log('카카오맵 로드 최대 재시도 횟수 초과, 페이지 새로고침 시도...');
+          setError(errorMessage);
+          
+          // 3초 후 자동 새로고침
+          setTimeout(() => {
+            console.log('🔄 카카오맵 로드 실패로 인한 자동 새로고침');
+            window.location.reload();
+          }, 3000);
+        }
       }
     };
 
     initializeMap();
-  }, [options.center.latitude, options.center.longitude, options.level]);
+  }, [options.center.latitude, options.center.longitude, options.level, retryCount]);
 
   // 지도 중심 이동 함수
   const moveToLocation = (position: Position) => {
@@ -148,6 +175,7 @@ export const useKakaoMap = (options: KakaoMapOptions) => {
     mapInstance: mapInstanceRef.current,
     moveToLocation,
     isLoaded,
-    error
+    error,
+    retryCount
   };
 };

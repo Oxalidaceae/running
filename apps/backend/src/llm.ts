@@ -124,7 +124,15 @@ async function attemptRecommendation(model: any, courses: any[]) {
 ${JSON.stringify(courses, null, 2)}
   `;
 
-  const result = await model.generateContent(prompt);
+  // 타임아웃 처리를 위한 Promise.race 사용
+  const generateContentPromise = model.generateContent(prompt);
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('LLM 호출이 8초를 초과했습니다.'));
+    }, 9000); // 8초 타임아웃 (프론트엔드 9초보다 1초 빠르게)
+  });
+
+  const result = await Promise.race([generateContentPromise, timeoutPromise]);
   const text = result.response.text();
   
   console.log('🤖 AI 원본 응답 (처음 500자):', text.substring(0, 500));

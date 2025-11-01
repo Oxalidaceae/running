@@ -20,6 +20,8 @@ interface CourseGenerationRequest {
  * 사용자 위치와 거리를 받아서 동적으로 코스를 생성하고 추천 결과를 반환
  */
 router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, res: Response) => {
+  const startTime = Date.now();
+  
   try {
     const { latitude, longitude, distance } = req.body;
 
@@ -31,6 +33,15 @@ router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, r
     }
 
     console.log(`🏃 코스 생성 시작: 위치(${latitude}, ${longitude}), 거리: ${distance}km`);
+
+    // 전체 프로세스에 대한 타임아웃 설정 (8초)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('코스 생성 요청이 시간을 초과했습니다. 잠시 후 다시 시도해주세요.'));
+      }, 8000);
+    });
+
+    const processPromise = (async () => {
 
     // 1. 러닝 코스 생성
     const start: LatLon = { lat: latitude, lon: longitude };
@@ -187,25 +198,47 @@ router.post('/generate', async (req: Request<{}, {}, CourseGenerationRequest>, r
 
     console.log('🎉 코스 생성 및 추천 완료!');
 
-    res.json({
-      success: true,
-      courses: coursesForFrontend,
-      basePosition: {
-        latitude,
-        longitude
-      },
-      metadata: {
-        totalCourses: completeData.courses.length,
-        radiusKm: distance / 2,
-        generatedAt: new Date().toISOString()
-      }
-    });
+      res.json({
+        success: true,
+        courses: coursesForFrontend,
+        basePosition: {
+          latitude,
+          longitude
+        },
+        metadata: {
+          totalCourses: completeData.courses.length,
+          radiusKm: distance / 2,
+          generatedAt: new Date().toISOString()
+        }
+      });
+    })();
+
+    // Promise.race로 타임아웃 또는 정상 처리 중 먼저 완료되는 것 실행
+    await Promise.race([processPromise, timeoutPromise]);
 
   } catch (error) {
-    console.error('코스 생성 오류:', error);
-    res.status(500).json({
+    const elapsedTime = Date.now() - startTime;
+    console.error(`코스 생성 오류 (${elapsedTime}ms):`, error);
+    
+    let errorMessage = '서버 오류가 발생했습니다.';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      if (error.message.includes('시간을 초과')) {
+        errorMessage = '코스 생성 요청이 시간을 초과했습니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 408; // Request Timeout
+      } else if (error.message.includes('LLM 호출')) {
+        errorMessage = 'AI 분석 서비스가 일시적으로 지연되고 있습니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 503; // Service Unavailable
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    res.status(statusCode).json({
       success: false,
-      message: error instanceof Error ? error.message : '서버 오류가 발생했습니다.',
+      message: errorMessage,
+      elapsedTime: elapsedTime,
     });
   }
 });

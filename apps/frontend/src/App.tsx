@@ -46,6 +46,9 @@ export default function App() {
   const [address, setAddress] = useState<string>('')
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
   const [isSavedCoursesMenuOpen, setIsSavedCoursesMenuOpen] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [timeoutCount, setTimeoutCount] = useState(0)
+  const [locationRetryCount, setLocationRetryCount] = useState(0)
 
   // 위치를 주소로 변환하는 함수
   const fetchAddress = async (lat: number, lng: number) => {
@@ -79,8 +82,23 @@ export default function App() {
   useEffect(() => {
     if (position && currentScreen === 'main') {
       fetchAddress(position.latitude, position.longitude);
+      // 위치 획득 성공 시 재시도 카운터 초기화
+      setLocationRetryCount(0);
     }
   }, [position, currentScreen]);
+
+  // 위치 정보 오류 시 자동 재시도
+  useEffect(() => {
+    if (error && !loading && locationRetryCount < 5) {
+      const timer = setTimeout(() => {
+        console.log(`🔄 위치 정보 자동 재시도 ${locationRetryCount + 1}/5`);
+        setLocationRetryCount(prev => prev + 1);
+        window.location.reload();
+      }, 5000); // 5초 후 재시도
+
+      return () => clearTimeout(timer);
+    }
+  }, [error, loading, locationRetryCount]);
 
   const handleCourseGeneration = async () => {
     if (!position || !distance) return
@@ -89,6 +107,12 @@ export default function App() {
 
     try {
       console.log('🏃 코스 생성 요청 중...');
+
+      // AbortController를 사용하여 타임아웃 구현
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 9900); // 9초 타임아웃
 
       const response = await fetch('http://localhost:3000/api/courses/generate', {
         method: 'POST',
@@ -100,7 +124,10 @@ export default function App() {
           longitude: position.longitude,
           distance: parseFloat(distance),
         }),
+        signal: controller.signal, // AbortController 신호 연결
       });
+
+      clearTimeout(timeoutId); // 성공 시 타임아웃 제거
 
       if (response.ok) {
         const data = await response.json();
@@ -108,15 +135,53 @@ export default function App() {
           setCourses(data.courses);
           console.log('✅ 코스 생성 완료:', data.courses.length + '개');
           setCurrentScreen('course-recommendation');
+          // 성공 시 카운터 초기화
+          setRetryCount(0);
+          setTimeoutCount(0);
         } else {
           alert(data.message || '코스 데이터를 가져올 수 없습니다.');
         }
       } else {
-        alert('서버에서 코스 데이터를 가져오는데 실패했습니다.');
+        // 서버에서 상세한 에러 메시지 제공 시 활용
+        try {
+          const errorData = await response.json();
+          alert(errorData.message || '서버에서 코스 데이터를 가져오는데 실패했습니다.');
+        } catch {
+          alert('서버에서 코스 데이터를 가져오는데 실패했습니다.');
+        }
       }
     } catch (error) {
       console.error('코스 데이터 로딩 오류:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      
+      // 타임아웃으로 인한 요청 취소인지 확인
+      if (error instanceof Error && error.name === 'AbortError') {
+        const newTimeoutCount = timeoutCount + 1;
+        setTimeoutCount(newTimeoutCount);
+        
+        const retry = confirm(
+          `코스 생성 시간이 초과했습니다.\n` +
+          '서버가 많은 요청을 처리중일 수 있습니다.\n\n' +
+          '다시 시도하시겠습니까?'
+        );
+        
+        if (retry) {
+          const newRetryCount = retryCount + 1;
+          setRetryCount(newRetryCount);
+          
+          // 항상 일정한 대기시간 (1초) 유지
+          setTimeout(() => {
+            handleCourseGeneration();
+          }, 1000);
+        } else {
+          // 사용자가 재시도를 원하지 않으면 카운터 초기화
+          setRetryCount(0);
+          setTimeoutCount(0);
+        }
+      } else {
+        alert('네트워크 오류가 발생했습니다.');
+        setRetryCount(0);
+        setTimeoutCount(0);
+      }
     } finally {
       setIsGeneratingCourse(false);
     }
@@ -234,10 +299,16 @@ export default function App() {
               <div className="text-center text-gray-500">
                 <p className="text-red-500 mb-2">⚠️ 지도를 불러올 수 없습니다</p>
                 <p className="text-sm mb-4">{error}</p>
+                {locationRetryCount < 5 ? (
+                  <p className="text-xs text-blue-500 mb-2">
+                    5초 후 자동으로 다시 시도합니다... ({locationRetryCount + 1}/5)
+                  </p>
+                ) : null}
                 <button
                   onClick={() => {
                     console.log('🔄 위치 정보 재시도 요청');
-                    window.location.reload(); // 간단한 재시도 방법
+                    setLocationRetryCount(0);
+                    window.location.reload();
                   }}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
                 >
@@ -321,9 +392,16 @@ export default function App() {
           className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
         >
           {isGeneratingCourse ? (
-            <div className="flex items-center justify-center space-x-2">
-              <span>코스 생성 중</span>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <div className="flex flex-col items-center justify-center space-y-1">
+              <div className="flex items-center space-x-2">
+                <span>코스 생성 중</span>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              </div>
+              {retryCount > 0 && (
+                <span className="text-xs opacity-80">
+                  재시도 중
+                </span>
+              )}
             </div>
           ) : (
             '코스 추천'
